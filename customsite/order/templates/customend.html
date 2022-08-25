@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/order.css' %}?ver=1">
+    <script src="{% static 'js/customend.js' %}?ver=1"></script>
+{% endblock %}
+
+{% block contents %}
+    <div class="text_wrap">
+        <h3>커스텀 상품 확인<br>
+        <h6>해당 제품의 상세 설명과 커스텀 방법에 대해 설명해드리겠습니다.</h6>
+    </div>
+
+    <div class="custom1" id="customend_wrap">
+        <div class="custom1_top">
+            <div class="slideshow-container">
+                <div class="slideshow-s" style="">
+                    <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+                    <div class="mySlides fades">
+                        <img style="width: 500px;" id="pimg3" src="{{ img_path }}">
+                    </div>
+                    <div class="mySlides fades">
+                        <img  style="width: 500px;"  id="pimg3" src="{{ img_path }}">
+                    </div>
+                <a class="next" onclick="plusSlides(1)">&#10095;</a>    
+                </div>
+            <div style="text-align:center">
+            <span class="dot" onclick="currentSlide(1)"></span> 
+            <span class="dot" onclick="currentSlide(2)"></span> 
+            </div> 
+            </div>
+
+            
+        
+        <div class="customend_detail">
+        <p id="productend_type" >{{ user.nickname }}님 커스텀 상품<br>
+        <div class="Tag">
+            <label for="Tag">Tag</label> 
+            <div class="selectsize"> 
+                <select class="form-control w-200" id="tagselect" name="tagselect" required>
+                    <option value="0" selected>태그를 선택해주세요.</option>
+                    <optgroup label="Season" data-max-options="2">
+                        <option value="봄">봄</option>
+                        <option value="여름">여름</option>
+                        <option value="가을">가을</option>
+                        <option value="겨울">겨울</option>
+                    </optgroup>
+                    <optgroup label="mood" data-max-options="2">
+                        <option value="데일리">데일리</option>
+                        <option value="힙합">힙합</option>
+                        <option value="캐주얼">캐주얼</option>
+                        <option value="모던">모던</option>
+                        <option value="러블리">러블리</option>
+                    </optgroup>
+                    <optgroup label="Theme" data-max-options="2">
+                        <option value="가족">가족</option>
+                        <option value="친구">친구</option>
+                        <option value="단체">단체</option>
+                        <option value="자유">자유</option>
+                    </optgroup>
+                </select>
+            </div> 
+        </div> 
+
+        <div class="request"> 
+            <label for="Request">요청사항</label>
+            <textarea id="reqinput" class="form-control w-50" row="2" placeholder="커스텀상품에 관해 요청사항이 있을 시 자세히 작성해주세요."></textarea>
+        </div>
+        {% comment %} <div class="amount"> 
+            <p>
+               <label for="number">수량: </label>
+                <select id="amount">
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
+            </p>
+        </div>  {% endcomment %}
+        <button id="CustomBtn2">Add to Cart</button>
+        <form id="ff" action="{% url 'Order:loading' %}" method="POST" class="Btn">
+            {% csrf_token %}
+            <input type="hidden" value="" name="product_tag">
+            <input type="hidden" value="" name="order_req">
+            <input type="hidden" value="1" name="order_amount">
+            <input type="hidden" value="{{ type_size }}" name="type_size">
+            <input type="hidden" value="{{ type_price }}" name="type_price">
+            <input type="hidden" value="{{ type_title }}" name="type_title">
+            <input type="hidden" value="{{ img_path }}" name="img_path">
+        </form>
+         </div>
+        </div>
+       </div>
+
+       <div class="modal fade" id="cartModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>장바구니에 추가</h3>
+                </div>
+                <div class="modal-body">완성품을 카드에 담으시겠습니까?</div>
+                <div class="modal-footer">
+                    <a id="backbtn" class="btn">초기화</a>
+                    <button form="ff" id="addbtn" class="btn btn-dark" data-dismiss="modal">예</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+        history.pushState(null, null,"http://127.0.0.1:8000/whitevalley/shopping/order/order_des/customend");
+        window.onpopstate = function () {   
+            history.go(1);
+            alert("커스텀 완료후 이전페이지로 돌아갈 수 없습니다.")
+        };
+    $("#CustomBtn2").click(function(){
+        if($("#tagselect").val() == "0"){
+            alert("태그는 필수 입니다.");
+        }else{
+            $("#cartModal").modal("show"); 
+        }
+        
+    });
+    $("#backbtn").click(function(e){
+        window.history.go(0);
+    });
+    $("[name='tagselect']").change(function(){
+        $("[name='product_tag']").val($(this).val());
+        console.log($("[name='product_tag']").val())
+    });
+    $("#reqinput").change(function(){
+        $("[name='order_req']").val($(this).val());
+    });
+    $("#amount").change(function(){
+        $("[name='order_amount']").val($(this).val());
+    });
+    
+</script>
+           
+
+{% endblock %}

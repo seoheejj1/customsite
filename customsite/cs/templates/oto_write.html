@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/cs.css' %}?ver=1">
+{% comment %} <script src="{% static 'js/cs.js' %}"></script> {% endcomment %}
+<script>
+    var value = $('input[name=oto]').val();
+</script>
+{% endblock %}
+
+{% block contents %}
+<div style="margin-top: 80px;">
+    <h2>1:1 문의</h2>
+    <h6>1:1 문의입니다.</h6>
+    <hr>
+</div>
+<form action="." method="POST">
+    <input type="hidden" name="oto" value="일대일">
+    {% csrf_token %}
+    <div class="mb-3 mt-3">
+        <label>작성자</label>
+        <span class="border bg-light rounded p-2">'{{ user.nickname }}' 님</span>
+    </div>
+    <div class="mb-3 mt-3">
+        <label for="title">1:1문의 제목</label>
+        <input type="text" class="form-control" id="title" placeholder="제목을 입력하세요" name="title" required>
+    </div>
+    <div class="mb-3 mt-3">
+        <label for="contents">1:1문의 내용</label>
+        <textarea class="form-control" rows="5" id="contents" placeholder="내용을 입력하세요" name="contents"
+            required></textarea>
+    </div>
+    <div style="margin-bottom:80px;">
+        <button type="submit" class="btn btn-dark">작성완료</button>
+        <a class="btn btn-dark" href="{% url 'Cs:oto_list' %}">목록가기</a>
+    </div>
+</form>
+{% endblock %}

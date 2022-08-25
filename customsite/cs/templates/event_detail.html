@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/cs.css' %}?ver=1">
+<script src="{% static 'js/cs.js' %}"></script>
+{% endblock %}
+
+{% block contents %}
+<div style="margin-top: 80px;">
+    <h2>이벤트</h2>
+    <h6>이벤트에 참여해보세요.</h6>
+    <hr>
+</div>
+<div class="mb-3 mt-3 clearfix">
+    <span class="float-start me-2">목록 {{ event.id }}번</span>
+    <span class="float-end ms-4">작성일 {{ event.reg_date|date:"Y-m-d" }}</span>
+    <span class="float-end">조회수 {{ event.view_cnt }}</span>
+</div>
+
+<section>
+    <div class="mb-3 mt-3">
+        <label for="title">이벤트 제목</label>
+        <div class="border bg-light rounded p-2">{{ event.title }}</div>
+    </div>
+    <div class="mb-3 mt-3">
+        <label for="date">이벤트 날짜</label><br>
+        {{ event.e_start }} ~ {{ event.e_end }}
+    </div>
+    <div class="mb-3 mt-3">
+        <label for="content">이벤트 내용</label>
+        <div class="border bg-light rounded p-2">
+            <pre>{{ event.content }}</pre>
+        </div>
+    </div>
+    <div style="margin-bottom:80px;">
+        {% if session.admin %}
+        <a class="btn btn-dark" href="{% url 'Cs:event_update' event.id %}">수정하기</a>
+        <button type="button" class="btn btn-dark" onclick="chkDelete()">삭제하기</button>
+        {% endif %}
+        <a class="btn btn-dark" href="{% url 'Cs:event_list' %}">목록가기</a>
+    </div>
+    <form action="{% url 'Cs:event_delete' %}" name="delete" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="id" value="{{ event.id }}">
+    </form>
+
+    <script>
+        function chkDelete() {
+            var d = confirm("삭제하시겠습니까?");
+            if (d) {
+                document.forms['delete'].submit();
+            }
+        }
+    </script>
+
+
+</section>
+{% endblock %}

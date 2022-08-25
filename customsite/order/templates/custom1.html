@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/order.css' %}?ver=1">
+{% endblock %}
+
+{% block contents %}
+    <div class="text_wrap">
+        <h3>색상 사이즈 선택<br>
+        <h6>상품의 컬러와 사이즈를 선택 후 'Next'버튼을 눌러주세요.
+    </div>
+
+    <div class="custom1">
+        <div class="custom1_top">
+            <div class="pimg_wrap">
+                <img id="pimg" src="{{ type_current.img }}" alt="sample">
+            </div>     
+        <div class="custom1_detail">
+            <p id="product_type" >{{ type_title }}<br>
+            <div class="selectcolor"> 
+                <select id="color" name="color">
+                    {% for color in type_colors %}
+                        <option value="{{ color.photo }}" {% if color.color == "흰색" %}selected{% endif %}>{{ color.color }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+                <div class="selectsize"> 
+                    <select id="size" name="size">
+                        <option value="S">S</option>
+                        <option value="M" selected>M</option>
+                        <option value="L">L</option>
+                        <option value="XL">XL</option>
+                        <option value="XXL">XXL</option>
+                        <option value="3XL">3XL</option>
+                    </select>
+                </div> 
+                <form action="{% url 'Order:custom2' %}" method="GET">
+                    <input type="hidden" value="{{ type_current.img }}" name="color_input">
+                    <input type="hidden" value="M" name="type_size">
+                    <input type="hidden" value="{{ type_price }}" name="type_price">
+                    <input type="hidden" value="{{ type_title }}" name="type_title">
+                    <div class="Btn">
+                        <button id="CustomBtn2">Next</button>
+                    </div>
+                </form>
+                
+                </div>
+        </div>
+    </div>
+           
+<script>
+    $(document).ready(function(){
+        $("[name='color']").change(function(){
+            $("[name='color_input']").val($(this).val());
+            $("#pimg").attr("src", $(this).val())
+        });
+
+        $("[name='size']").change(function(){
+            $("[name='type_size']").val($(this).val());
+        });
+    })
+ 
+
+    
+</script>
+
+{% endblock %}

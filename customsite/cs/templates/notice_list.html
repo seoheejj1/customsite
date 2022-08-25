@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/cs.css' %}?ver=1">
+<script src="{% static 'js/cs.js' %}"></script>
+{% endblock %}
+
+{% block contents %}
+<div style="margin-top: 80px;">
+    <h2>공지사항</h2>
+    <h6>다양한 정보와 새로운 소식을 알려드립니다.</h6>
+    <hr>
+</div>
+<div class="mb-3 mt-3">
+    <span class="float-start me-2">총 {{ notices.paginator.count }}개</span>
+    <span class="float-start">page {{ notices.number }}/{{ notices.paginator.num_pages }}</span>
+</div>
+
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>목록</th>
+            <th>제목</th>
+            <th>조회수</th>
+            <th>작성일</th>
+        </tr>
+    </thead>
+    <form action="" method="GET">
+        <div style="float: right; margin: 20px;">
+            <input type="text" placeholder="궁금한점을 검색해보세요" name="keyword" style="width:250px; height:38px;">
+            <button type="submit" class="btn btn-dark">검색</button>
+        </div>
+
+        {% if all_notices %}
+        {% for notice in notices %}
+        <tr onclick="location.href='{% url 'Cs:notice_detail' notice.id %}'" style="cursor: pointer;">
+            <td>{{ notice.id }}</td>
+            <td>{{ notice.title }}</td>
+            <td>{{ notice.view_cnt }}</td>
+            <td>{{ notice.reg_date|date:"Y-m-d" }}</td>
+        </tr>
+
+        {% endfor %}
+        {% else %}
+        {% if not keyword %}
+        <tr>
+            <td colspan="4">
+                일치하는 검색 결과가 없습니다.
+            </td>
+        </tr>
+        {% endif %}
+        {% endif %}
+    </form>
+</table>
+<div class="row">
+    <div class="col-12">
+        {% if session.admin %}
+        <a class="btn btn-dark" href="{% url 'Cs:notice_write' %}" style="float: right;">작성하기</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-2" style="margin:80px;">
+    <div class="col-12">
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if notices.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?p={{notices.previous_page_number}}">이전으로</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link disabled" href="#">이전으로</a>
+                </li>
+                {% endif %}
+                <li class="page-item active">
+                    <a class="page-link" href="#">{{notices.number}} / {{notices.paginator.num_pages }}</a>
+                </li>
+                {% if notices.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?p={{notices.next_page_number}}">다음으로</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link disabled" href="#">다음으로</a>
+                </li>
+                {% endif %}
+
+            </ul>
+        </nav>
+    </div>
+</div>
+
+{% endblock %}

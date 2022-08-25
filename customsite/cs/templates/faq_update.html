@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/cs.css' %}?ver=1">
+<script src="{% static 'js/cs.js' %}"></script>
+{% endblock %}
+
+
+{% block contents %}
+<div style="margin-top: 80px;">
+    <h2>FAQ</h2>
+    <hr>
+</div>
+<div class="mb-3 mt-3 clearfix">
+    <span class="float-start me-2">목록 {{ faq.id }}번</span>
+    <span class="float-end ms-4">작성일 {{ faq.reg_date|date:"Y-m-d" }}</span>
+    <span class="float-end">조회수 {{ faq.view_cnt }}</span>
+</div>
+
+<form action="." method="POST">
+    {% csrf_token %}
+    <div class="mb-3 mt-3">
+        <label for="title">제목</label>
+        <input type="text" class="form-control" id="title" name="title" value="{{ faq.title }}" required>
+    </div>
+    <div class="mb-3 mt-3">
+        <label for="content">내용</label>
+        <textarea class="form-control" rows="5" id="content" name="content" required>{{ faq.content }}</textarea>
+    </div>
+    <div style="margin-bottom:80px;">
+        {% if session.admin %}
+        {% csrf_token %}
+        <button type="submit" class="btn btn-dark">수정완료</button>
+        <a class="btn btn-dark" href="{% url 'Cs:faq_list' %}">목록가기</a>
+        {% endif %}
+    </div>
+</form>
+{% endblock %}

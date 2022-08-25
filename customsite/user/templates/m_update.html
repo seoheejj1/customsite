@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/user.css' %}?ver=1">
+    <script src="{% static 'js/user.js' %}"></script>
+{% endblock %}
+
+{% block contents %}
+
+<div class="title mb-5 mt-5">
+    <br>
+    <h2>매거진 > 수정</h2>
+    <hr>
+</div>
+
+
+<div class="container col-lg-12 mt-3">
+
+    <form action="." method="POST" enctype="multipart/form-data" >
+        {% csrf_token %}  
+        <div class="mb-3 mt-3">
+            <label for="title">제목</label>
+            <input type="text" class="form-control" id="title" placeholder="수정 할 제목을 입력하세요" name="title" value="{{ magazine.title }}">
+            <div class="mb-3 mt-3 clearfix">
+                <span class="float-end ms-4">작성일 : {{ magazine.reg_date|date:"Y-m-d H:i:s" }} </span>
+                <span class="float-end">조회수 : {{ magazine.view_cnt }} </span>
+            </div>
+        </div>
+        <div class="mb-3 mt-3" style="border: 1px solid lightgray;">
+            <div class="imgshow" style="text-align : center;">
+                <br>
+                {% if photo.board == board %}
+                    <div class='mb-3 mt-3'>
+                        <img class="imgshow " style="text-align : center" width="auto" height="350" src="{{ photos.photo }}" alt="..."/>
+                    </div>
+                {% endif %}
+            </div>
+            <br>
+            <label for="content">내용</label>
+            <hr>
+            <textarea class="form-control" style="resize: none; border: none;" rows="20" id="content" name="content" required>{{ magazine.content }}</textarea>
+
+        </div>
+
+        <input class="btn-outline-dark mt-3" type="file" name="uploadedFile" required><br>
+        <a class="btn btn-outline-dark float-end col-2 ml-3" href="{% url 'User:magazine_list' %}">목록</a>
+
+        <button type="submit" class="btn btn-outline-dark float-end col-2">수정완료</button>
+        <br>
+    </form>
+</div>
+
+<br>
+<br>
+
+<script>
+
+    $("[name='uploadedFile']").change(function() {console.log($(this).val())})
+
+</script>
+
+
+
+{% endblock %}

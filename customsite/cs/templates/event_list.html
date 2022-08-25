@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/cs.css' %}?ver=1">
+<script src="{% static 'js/cs.js' %}"></script>
+<style>
+    .col {
+        width: 580px;
+        padding: 20px;
+        margin-bottom: 20px;
+        float: left;
+    }
+
+    @media (max-width: 480px) {
+        .col {
+            float: none;
+            width: auto;
+        }
+</style>
+{% endblock %}
+
+{% block contents %}
+<div style="margin-top: 80px;">
+    <h2>이벤트</h2>
+    <h6>이벤트에 참여해보세요.</h6>
+    <hr>
+</div>
+{% comment %} <div class="album py-5 bg-light"> {% endcomment %}
+    <div class="container">
+        <div class="row row-cols-1" style="justify-content: center">
+            {% for event in events %}
+            <div class="card col-lg-4 mb-4 ml-2 shadow-sm" style="margin: 20px;">
+                <div class="card shadow-sm">
+                    {% for photo in photos %}
+                    {% if photo.board == event %}
+                    <img class="bd-placeholder-img card-img-top" src="{{ photo.photo }}"
+                        onclick="location.href='{% url 'Cs:event_detail' event.id %}'"
+                        style="cursor: pointer;">
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="card-body">
+                    <p class="card-text" style="text-align:center; font-size:30px;">{{ event.title }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+
+
+
+    {% comment %} </div> {% endcomment %}
+{% comment %} <h2>이벤트</h2>
+<h6>이벤트에 참여해보세요.</h6>
+<hr>
+<div class="mb-3 mt-3 clearfix">
+    <span class="float-start me-2">총 {{ events.paginator.count }}개</span>
+    <span class="float-start">page {{ events.number }}/{{ events.paginator.num_pages }}</span>
+</div>
+
+<table class="table table-striped table-hover">
+    {% for event in events %}
+    <tr>
+        <td>사진</td>
+        <td>사진</td>
+        <td>사진</td>
+    </tr>
+    <tr>
+        <td>{{ event.title }}</td>
+        <td>{{ event.title }}</td>
+        <td>{{ event.title }}</td>
+    </tr>
+    {% endfor %}
+</table> {% endcomment %}
+
+
+{% comment %} <div class="event">
+    <div class="eventimg">
+        <img src="http://know.nifos.go.kr/webzine/201812/images/event_img_01_m.jpg" alt="event1" />
+        <p>이벤트1</p>
+    </div>
+    <div class="eventimg">
+        <img src="http://know.nifos.go.kr/webzine/201812/images/event_img_01_m.jpg" alt="event2" />
+        <p>이벤트1</p>
+    </div>
+    <div class="eventimg">
+        <img src="http://know.nifos.go.kr/webzine/201812/images/event_img_01_m.jpg" alt="event3" />
+        <p>이벤트1</p>
+    </div>
+    <div class="eventimg">
+        <img src="http://know.nifos.go.kr/webzine/201812/images/event_img_01_m.jpg" alt="event4" />
+        <p>이벤트1</p>
+    </div>
+    <div class="eventimg">
+        <img src="http://know.nifos.go.kr/webzine/201812/images/event_img_01_m.jpg" alt="event5" />
+        <p>이벤트1</p>
+    </div>
+    <div class="eventimg">
+        <img src="http://know.nifos.go.kr/webzine/201812/images/event_img_01_m.jpg" alt="event6" />
+        <p>이벤트1</p>
+    </div>
+</div> {% endcomment %}
+
+<div class="row">
+    <div class="col-12">
+        {% if session.admin%}
+        {% csrf_token %}
+        <a class="btn btn-dark" href="{% url 'Cs:event_write' %}" style="float: right;">작성하기</a>
+        {% endif %}
+    </div>
+</div>
+
+
+<div class="row mt-2" style="margin:80px;">
+    <div class="col-12">
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if events.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?p={{events.previous_page_number}}">이전으로</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link disabled" href="#">이전으로</a>
+                </li>
+                {% endif %}
+                <li class="page-item active">
+                    <a class="page-link" href="#">{{events.number}} / {{events.paginator.num_pages }}</a>
+                </li>
+                {% if events.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?p={{events.next_page_number}}">다음으로</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link disabled" href="#">다음으로</a>
+                </li>
+                {% endif %}
+
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+{% endblock %}

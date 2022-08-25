@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/cs.css' %}?ver=1">
+<script src="{% static 'js/cs.js' %}"></script>
+{% endblock %}
+
+{% block contents %}
+<div style="margin-top: 80px;">
+<h2>공지사항</h2>
+<h6>다양한 정보와 새로운 소식을 알려드립니다.</h6>
+<hr>
+</div>
+<div class="mb-3 mt-3 clearfix">
+    <span class="float-start me-2">목록 {{ notice.id }}번</span>
+    <span class="float-end ms-4">작성일 {{ notice.reg_date|date:"Y-m-d" }}</span>
+    <span class="float-end">조회수 {{ notice.view_cnt }}</span>
+</div>
+
+<section>
+    <div class="mb-3 mt-3">
+        <label for="title">제목</label>
+        <div class="border bg-light rounded p-2">{{ notice.title }}</div>
+    </div>
+    <div class="mb-3 mt-3">
+        <label for="content">내용</label>
+        <div class="border bg-light rounded p-2">
+            <pre>{{ notice.content }}</pre>
+        </div>
+    </div>
+
+    <div style="margin-bottom:80px;">
+        {% if session.admin %}
+        <a class="btn btn-dark" href="{% url 'Cs:notice_update' notice.id %}">수정하기</a>
+        <button type="button" class="btn btn-dark" onclick="chkDelete()">삭제하기</button>
+        {% endif %}
+        <a class="btn btn-dark" href="{% url 'Cs:notice_list' %}">목록가기</a>
+
+        <form action="{% url 'Cs:notice_delete' %}" name="delete" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="id" value="{{ notice.id }}">
+        </form>
+    </div>
+    <script>
+        function chkDelete() {
+            var d = confirm("삭제하시겠습니까?");
+            if (d) {
+                document.forms['delete'].submit();
+            }
+        }
+    </script>
+
+
+</section>
+{% endblock %}

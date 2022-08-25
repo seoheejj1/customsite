@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/cs.css' %}?ver=1">
+<script src="{% static 'js/cs.js' %}"></script>
+{% endblock %}
+
+{% block contents %}
+<div style="margin-top:80px;">
+    <h2>FAQ</h2>
+    <hr>
+</div>
+<form action="." method="POST">
+    <input type="hidden" name="faq" value="FAQ">
+
+    {% csrf_token %}
+    <div class="mb-3 mt-3">
+        <label>작성자</label>
+        <input type="text" class="form-control" style="width:80px" placeholder="관리자" readonly>
+    </div>
+    <div class="mb-3 mt-3">
+        <label for="title">Question</label>
+        <input type="text" class="form-control" id="title" placeholder="질문을 입력해주세요" name="title" required>
+    </div>
+    <div class="mb-3 mt-3">
+        <label for="content">Answer</label>
+        <textarea class="form-control" rows="5" id="content" placeholder="답변을 입력해주세요" name="content" wrap="hard"
+            required></textarea>
+    </div>
+    <div style="margin-bottom:80px;">
+        {% if session.admin %}
+        {% csrf_token %}
+        <button type="submit" class="btn btn-dark">작성완료</button>
+        {% endif %}
+        <a class="btn btn-dark" href="{% url 'Cs:faq_list' %}">목록가기</a>
+    </div>
+</form>
+{% endblock %}

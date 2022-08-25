@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/cs.css' %}?ver=1">
+<script src="{% static 'js/cs.js' %}"></script>
+{% endblock %}
+
+{% block contents %}
+<div style="margin-top:80px;">
+    <h2>이벤트</h2>
+    <h6>이벤트에 참여해보세요.</h6>
+    <hr>
+</div>
+<form action="." method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="event" value="이벤트">
+
+    {% csrf_token %}
+    <div class="mb-3 mt-3">
+        <label>작성자</label>
+        <input type="text" class="form-control" style="width:75px" placeholder="관리자" readonly>
+    </div>
+    <div class="mb-3 mt-3">
+        <label for="title">이벤트 제목</label>
+        <input type="text" class="form-control" id="title" placeholder="제목을 입력하세요" name="title" required>
+    </div>
+    <div class="mb-3 mt-3">
+        <label for="date">이벤트 날짜</label><br>
+        <input type="date" id="e_start" name="e_start" min="2022-03-01" max="9999-12-31" required> ~
+        <input type="date" id="e_end" name="e_end" min="2022-03-01" max="9999-12-31" required>
+    </div>
+    <div class="mb-3 mt-3">
+        <label for="content">이벤트 내용</label>
+        <textarea class="form-control" rows="5" id="content" placeholder="내용을 입력하세요" name="content" wrap="hard"
+            required></textarea>
+    </div>
+    <div class="mb-3 mt-3">
+        <label for="formFileSm" class="form-label">업로드 파일</label>
+        <input type="file" name="uploadedFile" required>
+        {% comment %} <a href="#">{{ file.uploadedFile.url }}</a> {% endcomment %}
+    </div>
+
+    <div style="margin-bottom:80px;">
+        {% if session.admin%}
+        {% csrf_token %}
+        <button type="submit" class="btn btn-dark">작성완료</button>
+        {% endif %}
+        <a class="btn btn-dark" href="{% url 'Cs:event_list' %}">목록가기</a>
+    </div>
+</form>
+{% endblock %}

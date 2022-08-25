@@ -1,0 +1,370 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+    <style>
+        #link_icon div {
+            min-width: 113px;
+            transition: all 0.2s ease-in-out;
+        }
+        #link_icon div:hover {
+            transform: scale(106%);
+        }
+        table, tr, td, thead {
+            {% comment %} border:1px solid rgb(150, 150, 150); {% endcomment %}
+            padding:15px;
+        }
+        thead{
+            text-align:center;
+        }
+        .modal-content.modal-f {
+            width:1100px;
+        }
+        
+    </style>
+    <script>
+        $(function() {
+           $("#pw_check").on('submit', function() {
+                if (!$("[name='password']").val()) {
+                    alert("비밀번호를 입력해주세요!")
+                    return false;
+                }
+                return true;
+            })     
+        })   
+    </script>    
+    {% endblock %}    
+    
+    {% block contents %}
+    <div class="modal fade" id="exampleModalToggle" aria-hidden="true" aria-labelledby="exampleModalToggleLabel" tabindex="-1">
+      <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>{{ user }} 님 주문 목록</h3>  
+          </div>
+          <div class="modal-body">
+            <div>
+                <table class="table table-hover">
+                    <thead>
+                        <th>No.</th>
+                        <th>디자이너</th>
+                        <th>수량</th>
+                        <th>주문일</th>
+                        <th>상태</th>
+                        <th>수령인</th>
+                        <th>배송주소</th>
+                        <th>요청사항</th>
+                        <th>배송위치</th>
+                    </thead>
+                    <tbody class="mytable">
+
+                    {% if orders != "주문없음" %}
+                        {% for order in orders %}
+                            <tr style="cursor: pointer;">
+                                <td>
+                                    {{ order.pk }}
+                                </td>
+                                <td>
+                                    {{ order.product.user.nickname }}
+                                </td>
+                                <td>
+                                    {{ order.amount }}
+                                </td>
+                                <td>
+                                    {{ order.date | date:"Y-m-d" }}
+                                </td>
+                                <td>
+                                    {{ order.state }}
+                                </td>
+                                <td>
+                                    {{ order.r_name }}
+                                </td>
+                                <td>
+                                    {{ order.r_adress | truncatechars:"25" }}
+                                </td>
+                                <td>
+                                    {{ order.delivery_req | truncatechars:"10"}}
+                                </td>
+                                <td>
+                                    {{ order.r_location }}
+                                </td>
+                            </tr>
+                            <tr style="display: none;">
+                                <td colspan="9" class="text-center">
+                                    <button class="btn btn-dark" disabled style="display: flex;">detail</button>
+                                    <div style="padding:0 0 30px 100px;">
+                                    <div style="padding-top:30px;">
+                                        <div style="display: flex;">
+                                        <b style="margin-right:20px;">주소</b> {{ order.r_adress }} 
+                                        </div>
+                                    </div>                 
+                                    <div>
+                                        <div style="display: flex; padding-top:50px;">
+                                            <b style="padding:10px 40px 0 0 ; ">상품</b> <img style=" width:40%;" src="{{ order.product.img }}" alt="">
+                                        </div>
+                                    </div>  
+                                    <div>
+                                        <div style="display: flex; padding:5px 10px 4px 0;">
+                                            <b style="padding-top:8px;">수량/가격</b>
+                                            <button class="btn" disabled>{{ order.amount }}</button>
+                                            <button class="btn" disabled>/{{ order.product.type.price }}</button>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style="display: flex; padding:20px 10px 0 0;">
+                                            <b style="margin-right:20px;">요청사항</b> {{ order.delivery_req }}
+                                        </div>
+                                    </div> 
+                                    <div>
+                                        <div style="display: flex; padding:20px 10px 0 0;">
+                                            <b style="margin-right:20px;">주문일</b>{{ order.date }}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style="display: flex; padding:20px 10px 0 0;">
+                                            <b style="margin-right:20px;">배송위치</b>{{ order.r_location }} / {{ order.r_pw }}
+                                        </div>
+                                    </div>
+                                </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                            <tr>
+                                <td colspan="9">
+                                    <h3>주문이 존재하지 않습니다.</h3>
+                                </td>
+                            </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+                <div>
+                    <div style="display:flex;">
+                        <h5 style="padding-top: 9px;">총 구매 수량</h5>
+                        <button class="btn" disabled style="border:0;">{{ cnt }}개</button>
+                    </div>
+                    <div style="display:flex;">
+                        <h5 style="padding-top: 9px;">총 구매 금액</h5>
+                        <button class="btn" disabled style="border:0">{{ total }}원</button>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-dark" href=""  data-bs-dismiss="modal">확인</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="modal fade" id="exampleModalToggle_r" aria-hidden="true" aria-labelledby="exampleModalToggleLabel" tabindex="-1">
+      <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>{{ user }} 님 리뷰 목록</h3>  
+          </div>
+          <div class="modal-body">
+            <div>
+                {% if reviews != "리뷰없음" %}
+                    {% for review in reviews %}
+                    <button class="btn btn-dark" style="margin-left:15px;" disabled>리뷰</button>
+                    <div  style="border:2px solid rgba(212, 212, 212, 0.5); border-radius:5px; padding: 10px; margin:20px 0 50px 20px;">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">등록일자</span>
+                            </div>
+                            <input type="text" class="form-control" aria-describedby="basic-addon1" value="{{ review.0.reg_date }}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">제목</span>
+                            </div>
+                            <input type="text" class="form-control" aria-describedby="basic-addon1" value="{{ review.0.title }}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">내용</span>
+                            </div>
+                            <input type="text" class="form-control" aria-describedby="basic-addon1" value="{{ review.0.contents }}">
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">포토</span>
+                            </div>
+                            <div style="width:500px;">
+                                <img class="form-control" aria-describedby="basic-addon1" src="{{ review.1.photo }}">
+                            </div>
+                            
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">조회수</span>
+                            </div>
+                            <input type="text" class="form-control" aria-describedby="basic-addon1" value="{{ review.0.view_cnt }}">
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                        <h3>작성된 리뷰가 없습니다.</h3>
+                {% endif %}
+                
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-dark" href=""  data-bs-dismiss="modal">확인</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="exampleModalToggle_f" aria-hidden="true" aria-labelledby="exampleModalToggleLabel"
+    tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>{{ user }} 님 완성품 목록</h3>
+            </div>
+            <div class="modal-body row">
+                {% if products == "완성품없음" %}
+                    <h3>커스텀된 완성품이 없습니다.</h3>
+                    {% else %}
+                    {% for product in products %}
+                    <div class="col-sm-6 p-5">
+                    <div class="card m-3">
+                        
+                      <img src="{{product.img}}" style='width:100%; height:100%' alt="">
+              
+                      <div class="card-body">
+                        <h5 class="card-title">타입 : {{product.type}}</h5>
+                        <p class="card-text">사이즈 : {{product.size}}</p>
+                        <p class="card-text"><small class="text-muted">{{product.reg_date}}</small></p>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+              {% endif %}
+               
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-dark" href="" data-bs-dismiss="modal">확인</button>
+            </div>
+        </div>
+    </div>
+    </div>
+    
+
+    <div class="w-100 p-4 bg-dark rounded-pill text-light d-flex flex-column justify-content-around align-items-center">
+        <h2><strong>{{ user.nickname }}</strong> 님 환영합니다.</h2>
+    </div>
+    <hr>
+    <div class="container d-flex flex-column justify-content-center align-items-center">
+        <div class="modal fade" id="exampleModalToggle_userinfo" aria-hidden="true" aria-labelledby="exampleModalToggleLabel" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <form action="{% url 'User:info_modify' %}" method="GET" class="modal-content" id="pw_check">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalToggleLabel">본인인증</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6>패스워드를 입력해주세요.</h6>
+                        <input class="form-control" type="hidden" name="real_password" value="{{ user.password }}">
+                        <input class="form-control" type="password" name="password">
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary">인증하기</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% if session.kakao %}
+            <button class="btn btn-outline-dark border-4 pb-2 mb-3" id="kakao_alert" title="카카오 유저는 정보를 수정할 수 없습니다."><i class="fa-solid fa-user-astronaut fs-4 mt-2"></i></button>
+        {% else %}
+            <button data-bs-toggle="modal" href="#exampleModalToggle_userinfo" class="btn btn-outline-dark border-4 pb-2 mb-3" title="내 정보 수정하기"><i class="fa-solid fa-user-astronaut fs-4 mt-2"></i></button>
+        {% endif %}
+        <h4><strong>이메일: {{ user.email }}</strong></h4>
+        <h4><strong>연락처: {{ user.contact }}</strong></h4>
+        <h4><strong>적립금: {{ user.point }}</strong></h4>
+        <h4><strong>가입일: {{ user.reg_date | date:"Y-m-d"}}</strong></h4>
+    </div>
+    <hr>
+    <div class="container mb-5 text-center">
+        <div class="fw-bold row" id="link_icon">
+            <div class="mb-3 col-sm-3 d-flex justify-content-center align-item-center">
+                <div class="m-3 text-light bg-dark w-75 h-100 d-flex flex-column justify-content-center align-item-center" style="border-radius: 20px; cursor: pointer;" onclick="location.href='{% url 'Cs:notice_list' %}'">
+                    <i class="fa-solid fa-file-pen ms-4 mt-2 mb-2 display-1"></i>
+                    <h5>공지사항</h5>
+                </div>
+            </div>
+            <div class="mb-3 col-sm-3 d-flex justify-content-center align-item-center">
+                <div class="m-3 text-light bg-dark w-75 h-100 d-flex flex-column justify-content-center align-item-center" style="border-radius: 20px; cursor: pointer;" onclick="location.href='{% url 'Cs:event_list' %}'">
+                    <i class="fa-solid fa-gift m-3 mt-2 mb-2 display-1"></i>
+                    <h5>이벤트</h5>
+                </div>
+            </div>
+            <div class="mb-3 col-sm-3 d-flex justify-content-center align-item-center">
+                <div class="m-3 text-light bg-dark w-75 h-100 d-flex flex-column justify-content-center align-item-center" style="border-radius: 20px; cursor: pointer;" onclick="location.href='{% url 'Order:order' %}'">
+                    <i class="fa-solid fa-palette mb-2 display-1"></i>
+                    <h5>커스텀 하기</h5>
+                </div>
+            </div>
+            <div class="mb-3 col-sm-3 d-flex justify-content-center align-item-center">
+                <div class="m-3 text-light bg-dark w-75 h-100 d-flex flex-column justify-content-center align-item-center" style="border-radius: 20px; cursor: pointer;" onclick="location.href='{% url 'Cs:faq_list' %}'">
+                    <i class="fa-solid fa-file-circle-question ms-4 mt-2 mb-2 display-1"></i>
+                    <h5>FAQ</h5>
+                </div>
+            </div>
+            <div class="mb-3 col-sm-3 d-flex justify-content-center align-item-center">
+                <div class="m-3 text-light bg-dark w-75 h-100 d-flex flex-column justify-content-center align-item-center" style="border-radius: 20px; cursor: pointer;" onclick="location.href='{% url 'Cs:oto_list' %}'">
+                    <i class="fa-solid fa-circle-question mb-2 display-1"></i>
+                    <h5>내 1:1문의</h5>
+                </div>
+            </div>
+            <div class="mb-3 col-sm-3 d-flex justify-content-center align-item-center">
+                <div class="m-3 text-light bg-dark w-75 h-100 d-flex flex-column justify-content-center align-item-center" style="border-radius: 20px; cursor: pointer;" data-bs-toggle="modal" href="#exampleModalToggle_f" role="button">
+                    <i class="fa-solid fa-shirt mb-2 display-1"></i>
+                    <h5>내 완성품</h5>
+                </div>
+            </div>
+            <div class="mb-3 col-sm-3 d-flex justify-content-center align-item-center" data-bs-toggle="modal" href="#exampleModalToggle_r" role="button">
+                <div class="m-3 text-light bg-dark w-75 h-100 d-flex flex-column justify-content-center align-item-center" style="border-radius: 20px; cursor: pointer;" id="my_review_wrap">
+                    <i class="fa-solid fa-book-open mb-2 display-1"></i>
+                    <h5>내 포토후기</h5>
+                </div>
+            </div>
+            <div class="mb-3 col-sm-3 d-flex justify-content-center align-item-center" data-bs-toggle="modal" href="#exampleModalToggle" role="button">
+                <div class="m-3 text-light bg-dark w-75 h-100 d-flex flex-column justify-content-center align-item-center" style="border-radius: 20px; cursor: pointer;" id="my_list_wrap">
+                    <i class="fa-solid fa-magnifying-glass-dollar mb-2 display-1"></i>
+                    <h5>내 주문목록</h5>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+
+<script>
+    $("#my_list_wrap").click(function(e){
+        e.preventDefault();
+        $("#my_list").modal("show");
+    });
+    $("#my_review_wrap").click(function(e){
+        e.preventDefault();
+        $("#my_list_r").modal("show");
+    });
+
+    $("#kakao_alert").click(function() {
+        alert("카카오 유저는 정보를 수정할 수 없습니다!");
+    })
+
+    var cnt = 0
+    $(".mytable").children().each(function() {
+        cnt++;
+
+        if (cnt % 2 == 1) {
+            $(this).click(function() {
+                $(this).next().slideToggle(0);
+            })
+        }
+    })
+</script>
+{% endblock %}

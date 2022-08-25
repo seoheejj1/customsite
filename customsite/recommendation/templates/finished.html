@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/recommendation.css' %}?ver=1">
+<script src="{% static 'js/recommendation.js' %}"></script>
+<script>
+$(function() {
+    $("[name='order_filter']").change(function() {
+        $(this).parent().submit();
+    })
+})
+
+
+</script>
+<style>
+    .termbtn{
+        margin-top: 30px;
+    }
+    
+    .imgform {
+        border-radius: 12px;
+    }
+
+    .form-control{
+        width:10%;
+        float: left;
+    }
+
+    
+
+    
+</style>
+{% endblock %}
+
+{% block contents %}
+<div class="container">
+    <div class="row" style='height:200px'>
+        <div class="col-sm-12 bg-light text-dark" style='border-radius:24px'>
+            <h1 class='text-center'>BEST REVIEW</h1>
+            <div class='text-center termbtn' style="margin: top 50px">
+                <a class="btn text-white" style="background-color: #000000;" href="/whitevalley/shopping/finished">완성품</a>
+                <a class="btn btn-outline-dark" href="/whitevalley/shopping/tag_reviews">태그별 맞춤</a>
+                <a class="btn btn-outline-dark" href="/whitevalley/shopping/reviews">상품후기</a>
+            </div>
+            <hr>
+        </div>
+    </div>
+    <p></p>
+    <div class="container">
+        <form action="." method="POST">
+            {% csrf_token %}
+            <select class="form-control" name="order_filter">
+                <option value='new_list' {% if order_method == "최신순" %}selected{% endif %}>최신순 ></option>
+                <option value='good_list' {% if order_method == "인기순" %}selected{% endif %}>인기순 ></option>
+            </select>
+        </form>
+    </div>
+</div>
+<br>
+<div></div>
+<hr style='margin-top:40px'>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-6">
+    {% for product in products %}
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <img src="{{product.img}}" style='width:100%; height:100%' alt="">
+                    <p class="card-text">옵션 : {{product.type}}/ 사이즈 : {{product.size}}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group d-flex align-items-center">
+                            <div>
+                                <button type="button" class="btn btn-sm btn-outline-secondary p-2" onclick="location.href='{% url 'Recommendation:finished_detail' product.id %}'">View</button>
+                            </div>
+                            {% if session.user %}
+                                <form action="{% url 'Recommendation:finished_detail' product.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <button class="btn btn-sm btn-outline-secondary p-2">장바구니담기</button>
+                                </form>
+                            {% endif %}
+                            {% if session.admin %}
+                                <form action="{% url 'Recommendation:finished_delete' product.id %} ">
+                                    <button class="btn btn-danger" onclick="return confirm('해당 게시물을 삭제하시겠습니까?')">삭제</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">조회수 : {{product.view_cnt}}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+</div>
+
+
+
+{% comment %} 페이징 {% endcomment %}
+<ul class="pagination justify-content-center" style='margin:50px'>
+   
+    {% if question_list.has_previous %}
+    <li class="page-item">
+        <a class="page-link" href="?page={{ question_list.previous_page_number }}">이전</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+        <a class="page-link" tabindex="-1" aria-disabled="true" href="#">이전</a>
+    </li>
+    {% endif %}
+    
+    {% if question_list.paginator.num_pages %}
+        {% for page in page_range %}
+            {% if question_list.number != page %}
+                <li class="page-item" aria-current="page"><a class="page-link" href="{% url 'Recommendation:finished' %}?page={{ page }}">{{ page }}</a></li>
+            {% else %}
+                <li class="page-item active" aria-current="page"><a class="page-link" href="#" title="현재페이지">{{ page }}</a></li>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% comment %} {% for page_number in question_list.paginator.page_range %}
+        {% if page_number == question_list.number %}
+            <li class="page-item active" aria-current="page">
+                <a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a>
+            </li>
+        {% else %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a>
+            </li>
+        {% endif %}
+    {% endfor %} {% endcomment %}
+   
+    {% if question_list.has_next %}
+    <li class="page-item">
+        <a class="page-link" href="?page={{ question_list.next_page_number }}">다음</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+        <a class="page-link" tabindex="-1" aria-disabled="true" href="#">다음</a>
+    </li>
+    {% endif %} 
+</ul>
+
+
+{% endblock %}

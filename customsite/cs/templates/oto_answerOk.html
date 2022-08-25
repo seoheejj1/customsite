@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/cs.css' %}?ver=1">
+    <script src="{% static 'js/cs.js' %}"></script>
+{% endblock %}
+
+{% block contents %}
+<script>
+    alert("답변이 등록되었습니다.");
+    location.href = "{% url 'Cs:oto_detail' pk  %}"
+</script>
+{% endblock %}

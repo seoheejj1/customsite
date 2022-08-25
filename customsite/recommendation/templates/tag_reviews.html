@@ -1,0 +1,410 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/recommendation.css' %}?ver=1">
+<script src="{% static 'js/recommendation.js' %}"></script>
+<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script>
+  function removeCheck() {
+
+    if (confirm("정말 삭제하시겠습니까??") == true) { //확인
+
+      document.removefrm.submit();
+
+    } else { //취소
+
+      return false;
+
+    }
+  }
+
+  $(function () {
+    $(".tag_filter_btn").children().each(function () {
+      $(this).click(function () {
+        $("#tag_filter_input").val($(this).text().slice(1))
+        console.log(window.location.href)
+        if(window.location.href.indexOf('?') == -1){
+          window.location.href=window.location.href+'?page=1&tag='+$(this).text().slice(1)
+        }
+        else {
+          window.location.href=window.location.href.split('?')[0]
+            +'?page=1'+'&tag='+$(this).text().slice(1)
+          }
+        
+
+      })
+    })
+  })
+
+
+
+  $(function () {
+    $($('.page-link')[0]).click(function(){
+
+
+    })
+      $($('.page-link')[$('.page-link').length-1]).click(function(){
+
+      })
+    for(let i=1; i<$('.page-link').length-1; i++){
+      $($('.page-link')[i]).click(function(){
+        const baseurl = window.location.href.split('?')[0]
+        const tag = window.location.href.split('&')[1]
+        if (tag !== undefined){
+          window.location.href=baseurl + '?page='+ i +'&'+tag
+        }
+        
+        else{
+          window.location.href=baseurl + '?page='+ i
+        }
+      })
+    }
+  })
+</script>
+
+<style>
+  .termbtn {
+    margin-top: 30px;
+  }
+
+  .tagnaming {
+    float: left;
+  }
+
+  .imgform {
+    border-radius: 12px;
+  }
+
+  .highcharts-figure,
+  .highcharts-data-table table {
+    min-width: 320px;
+    max-width: 800px;
+    margin: 1em auto;
+  }
+
+  .highcharts-data-table table {
+    font-family: Verdana, sans-serif;
+    border-collapse: collapse;
+    border: 1px solid #ebebeb;
+    margin: 10px auto;
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .highcharts-data-table caption {
+    padding: 1em 0;
+    font-size: 1.2em;
+    color: #555;
+  }
+
+  .highcharts-data-table th {
+    font-weight: 600;
+    padding: 0.5em;
+  }
+
+  .highcharts-data-table td,
+  .highcharts-data-table th,
+  .highcharts-data-table caption {
+    padding: 0.5em;
+  }
+
+  .highcharts-data-table thead tr,
+  .highcharts-data-table tr:nth-child(even) {
+    background: #f8f8f8;
+  }
+
+  .highcharts-data-table tr:hover {
+    background: #f1f7ff;
+  }
+
+  #tagwrap {
+    text-align: center;
+    margin-top: 78px;
+  }
+
+  #season button {
+    margin: 20px;
+  }
+
+  #mood button {
+    margin: 20px;
+  }
+
+  #theme button {
+    margin: 20px;
+  }
+</style>
+{% endblock %}
+
+{% block contents %}
+
+<div class="container">
+  <div class="row" style='height:200px'>
+    <div class="col-sm-12 bg-light text-dark" style='border-radius:24px'>
+      <h1 class='text-center'>BEST REVIEW</h1>
+      <div class='text-center termbtn' style="margin: top 50px">
+        <a class="btn btn-outline-dark" href="/whitevalley/shopping/finished">완성품</a>
+        <a class="btn text-white" style="background-color: #000000;" href="/whitevalley/shopping/tag_reviews">태그별 맞춤</a>
+        <a class="btn btn-outline-dark" href="/whitevalley/shopping/reviews">상품후기</a>
+      </div>
+      <hr>
+    </div>
+  </div>
+  <p></p>
+  <div id="container" style="width: 550px; height: 550px; margin: 0 auto"></div>
+  <script language="JavaScript">
+    $(document).ready(function () {
+      Highcharts.chart('container', {
+        chart: {
+          type: 'packedbubble',
+          height: '100%',
+        },
+        title: {
+          text: 'Whitevalley 인기 태그 차트'
+        },
+        tooltip: {
+          useHTML: true,
+          pointFormat: '<b>{point.name}</b> (인기도{point.value})'
+        },
+        plotOptions: {
+          packedbubble: {
+            minSize: '30%',
+            maxSize: '120%',
+            zMin: 0,
+            zMax: 1000,
+            events: {
+              click: function (e) {
+                $("#tagtext").css("display", "none");
+                if (e.point.series.index == 0) {
+                  $("#season").css("display", "block");
+                  $("#mood").css("display", "none");
+                  $("#theme").css("display", "none");
+                } else if (e.point.series.index == 1) {
+                  $("#season").css("display", "none");
+                  $("#mood").css("display", "block");
+                  $("#theme").css("display", "none");
+                } else if (e.point.series.index == 2) {
+                  $("#season").css("display", "none");
+                  $("#mood").css("display", "none");
+                  $("#theme").css("display", "block");
+                }
+              }
+            },
+            layoutAlgorithm: {
+              splitSeries: false,
+              gravitationalConstant: 0.02
+            },
+            dataLabels: {
+              enabled: true,
+              format: '{point.name}',
+              filter: {
+                property: 'y',
+                operator: '>',
+                value: 250
+              },
+              style: {
+                color: 'black',
+                textOutline: 'none',
+                fontWeight: 'normal'
+              }
+            }
+          }
+        },
+        series: [{
+            name: '계절별',
+            data: [{
+                name: "봄",
+                value: {{ 봄 }}
+              },
+              {
+                name: "여름",
+                value: {{ 여름 }}
+              },
+              {
+                name: "가을",
+                value: {{ 가을 }}
+              },
+              {
+                name: "겨울",
+                value: {{ 겨울 }}
+              }
+            ]
+          },
+          {
+            name: '분위기별',
+            data: [{
+                name: "데일리",
+                value: {{ 데일리 }}
+              },
+              {
+                name: "힙합",
+                value: {{ 힙합 }}
+              },
+              {
+                name: "캐주얼",
+                value: {{ 캐주얼 }}
+              },
+              {
+                name: "모던",
+                value: {{ 모던 }}
+              },
+              {
+                name: "러블리",
+                value: {{ 러블리 }}
+              }
+            ]
+          },
+          {
+            name: '장르별',
+            data: [{
+                name: "가족",
+                value: {{ 가족 }}
+              },
+              {
+                name: "친구",
+                value: {{ 친구 }}
+              },
+              {
+                name: "단체",
+                value: {{ 단체 }}
+              },
+              {
+                name: "자유",
+                value: {{ 자유 }}
+              }
+            ]
+          }
+        ]
+      });
+    });
+  </script>
+  <hr>
+  <div>
+    <div class="w-100 text-end">
+      <a href="." class="btn btn-outline-dark">초기화&nbsp<i class="fa-solid fa-sync fa-spin"></i></a>
+    </div>
+    <div id="tagwrap" class="mb-5">
+      <input type="hidden" id="tag_filter_input">
+      <div>
+        <button class="btn btn-primary" id="tagtext" disabled>차트에서 태그 그룹을 선택해주세요.</button>
+      </div>
+
+      <div style="display: none;" id="season" class="tag_filter_btn">
+        <button class="btn btn-secondary">#봄</button>
+        <button class="btn btn-secondary">#여름</button>
+        <button class="btn btn-secondary">#가을</button>
+        <button class="btn btn-secondary">#겨울</button>
+      </div>
+      <div style="display: none;" id="mood" class="tag_filter_btn">
+        <button class="btn btn-secondary">#데일리</button>
+        <button class="btn btn-secondary">#힙합</button>
+        <button class="btn btn-secondary">#캐주얼</button>
+        <button class="btn btn-secondary">#모던</button>
+        <button class="btn btn-secondary">#러블리</button>
+      </div>
+      <div style="display: none;" id="theme" class="tag_filter_btn">
+        <button class="btn btn-secondary">#가족</button>
+        <button class="btn btn-secondary">#단체</button>
+        <button class="btn btn-secondary">#친구</button>
+        <button class="btn btn-secondary">#자유</button>
+      </div>
+    </div>
+
+
+
+  </div>
+  <br>
+  <div></div>
+  <hr style='margin-top:40px'>
+
+
+
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-6">
+    {% for tag in tag_product %}
+    <div class="col tag_filter">
+      
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <img src="{{tag.0.img}}" style='width:100%; height:100%' alt="">
+          {% if config.tag_show %}
+            <p class="card-text" style='color:blue'>#{{tag.1}}</p>
+          {% endif %}
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="btn-group">
+              <button type="button" class="btn btn-sm btn-outline-secondary"
+                onclick="location.href='{% url 'Recommendation:tag_reviews_detail' tag.0.id %}'">View</button>
+              {% if session.user %}
+              <form action="{% url 'Recommendation:tag_reviews_detail' tag.0.id %}" method="POST">
+                {% csrf_token %}
+                <button class="btn btn-sm btn-outline-secondary">장바구니담기</button>
+              </form>
+              {% endif %}
+            </div>
+            <small class="text-muted"> {{tag.0.user.nickname}} 님</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+
+
+
+  {% comment %} 페이징 {% endcomment %}
+  <ul class="pagination justify-content-center" style='margin:50px'>
+
+    {% if question_list.has_previous %}
+    <li class="page-item">
+      <a class="page-link" href="?page={{ question_list.previous_page_number }}">이전</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+      <a class="page-link" tabindex="-1" aria-disabled="true" href="#">이전</a>
+    </li>
+    {% endif %}
+
+    {% if question_list.paginator.num_pages %}
+    {% for page in page_range %}
+    {% if question_list.number != page %}
+    <li class="page-item" aria-current="page"><a class="page-link"
+        href='javascript:void(0)'>{{ page }}</a></li>
+    {% else %}
+    <li class="page-item active" aria-current="page"><a class="page-link" href="#" title="현재페이지">{{ page }}</a></li>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+
+    {% comment %} {% for page_number in question_list.paginator.page_range %}
+    {% if page_number == question_list.number %}
+    <li class="page-item active" aria-current="page">
+      <a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a>
+    </li>
+    {% else %}
+    <li class="page-item">
+      <a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a>
+    </li>
+    {% endif %}
+    {% endfor %} {% endcomment %}
+
+    {% if question_list.has_next %}
+    <li class="page-item">
+      <a class="page-link" href="?page={{ question_list.next_page_number }}">다음</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+      <a class="page-link" tabindex="-1" aria-disabled="true" href="#">다음</a>
+    </li>
+    {% endif %}
+  </ul>
+</div>
+
+  {% endblock %}

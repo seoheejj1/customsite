@@ -1,0 +1,313 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+    {% load static %}
+    <script src="/path/to/dist/panzoom.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom/dist/panzoom.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/order.css' %}?ver=1">
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+    <script src="{% static 'js/html2canvas.js' %}"></script>
+    <script src="{% static 'js/order2.js' %}"></script>
+{% endblock %}
+
+{% block contents %}
+    <div class="text_wrap">
+        <h3>커스텀<br>
+        <h6>문구와 이미지를 추가해 원하는 위치로 이동시키고 Custom이 완료되면 'Next'버튼을 눌러주세요.
+            
+    </div>
+    <div class="custom2">
+        <div class="custom1_top">
+            <div class="pimg2_wrap">
+                <div id="parent" class="parent" style="width:500px; height:500px; background-image:URL({{ color }}); background-size:cover;">
+                    <div id="textresult" style='position:absolute; left:300px; top:300px; cursor:pointer; cursor:hand; font-weight: bold; font-size: 20px;' onmousedown='startDrag(event, this);'></div>
+                    <div class="panzoom" id="panzoom-element" >
+                        <img id="uploadimg" src="" width="200"  style="display:none; z-index:2; position: absolute;">
+                    </div>
+                    <div id="patternimg_wrap" style="display: none;">
+                        <img src="" id="patternimg">
+                    </div>
+                </div> 
+            </div>          
+            <div class="custom2_detail">
+                <div>
+                    <div>
+                        <p id="product_type">{{ type_title }}({{ type_size }})</p>
+                    </div>
+                    <div style="padding-right:70%"><a data-toggle="tooltip" style="text-decoration: none; padding:30px;" title="이미지는 마우스 휠로 크기 조절 가능합니다. &#8251;상세한 변경을 더 원하시면 다음 페이지 요청란에 적어주세요&#8251;">TIP</a></div>
+                </div>
+             
+            <div class="text_contain">
+                <form onsubmit="return false;" action="" class="form-horizontal">
+                        <div id="text2_wrap" class="form-inline form-group">
+                            <label for="inputtext" class="col-xs control-label" id="inputtext">Text</label>
+                            <div id="text_input_wrap" class="col-sm-6">
+                                <input onsubmit="return false;" onkeyup="printText()" type="text" name="text_input" id="text_input" class="form-control w-75" placeholder="15글자 이하의 텍스트" maxlength="15" required>
+                            </div>
+                            <div id="colorview_wrap">
+                                <img onclick="showModal();" id='colorwheel' src="/static/image/colorwheel.png">        
+                            </div>
+                             
+                                <div class="modal-window">
+                                    <div class="content">
+                                        <div id="picker"></div>
+                                        <div class="Btn"><a onclick="hideModal();" id="CustomBtn3">OK</a></div>
+                                    </div>
+                                </div>
+                        </div>
+                </form>  
+            </div>
+            <div class="selectpattern"> 
+                <label id="selecttext" for="selecttext" class="col-xs control-label">Pattern</label>
+                <select class="form-control w-25" id="selectpattern" name="selectpattern"  onchange="document.all.s_input.value=document.all.selectpattern.value;" required>
+                    <option value="0">선택</option>
+                    <option value="p1">무지</option>
+                    <option value="/static/image/patterns/s_p1.png">도트</option>
+                    <option value="/static/image/patterns/s_p2.png">페인트</option>
+                    <option value="/static/image/patterns/s_p3.png">빈티지</option>
+                </select>
+            </div> 
+            <div class="selectpattern2" style="display: none;"> 
+                <label id="selecttext" for="selecttext" class="col-xs control-label">Pattern</label>
+                <select class="form-control w-25" id="selectpattern2" name="selectpattern2"  onchange="document.all.s_input.value=document.all.selectpattern.value;" required>
+                    <option value="0">선택</option>
+                    <option value="p1">무지</option>
+                    <option value="/static/image/patterns/m_p1.png">도트</option>
+                    <option value="/static/image/patterns/m_p2.png">페인트</option>
+                    <option value="/static/image/patterns/m_p3.png">빈티지</option>
+                </select>
+            </div> 
+            <div class="selectpattern3" style="display: none;"> 
+                <label id="selecttext" for="selecttext" class="col-xs control-label">Pattern</label>
+                <select class="form-control w-25" id="selectpattern3" name="selectpattern3"  onchange="document.all.s_input.value=document.all.selectpattern.value;" required>
+                    <option value="0">선택</option>
+                    <option value="p1">무지</option>
+                    <option value="/static/image/patterns/h_p1.png">도트</option>
+                    <option value="/static/image/patterns/h_p2.png">페인트</option>
+                    <option value="/static/image/patterns/h_p3.png">빈티지</option>
+                </select>
+            </div> 
+            <div class="imageupload" style="height:10%">
+                <label class="col-xs control-label" id="imagetext" style="margin-right:90px;">Image</label>
+    
+                {% comment %} <input type="file" id="imgwrap" name="imgwrap" > {% endcomment %}
+                <input type="file" accept=".png,.gif,.png,.jpg,.jpeg" id="imgwrap"  style="display:none;" name='imgwrap'>
+                <img id="imgbtn" onclick='document.all.imgwrap.click(); document.all.imgwrap2.value=document.all.imgwrap.value;' src="https://img.icons8.com/ios-glyphs/344/pictures-folder.png">
+                
+                
+            </div>
+            <div class="Btn"><a id="CustomBtn2">Next</a></div>
+            
+            </div>
+        </div>   
+       </div>
+        <form action="{% url 'Order:customend' %}" method="POST" id="file_base">
+           {% csrf_token %}
+            <input type="hidden" value="0" name="t_input" style="display: none;">
+            <input type="hidden" value="0" name="s_input" style="display: none;">
+            <input type="hidden" value="0" name="file_base" style="display: none;">
+            <input type="hidden" value="{{ type_price }}" name="type_price">
+            <input type="hidden" value="{{ type_size }}" name="type_size">
+            <input type="hidden" value="{{ type_title }}" name="type_title">
+            <input type="hidden" value="0" id="input_image" name="i_input" style="display: none;">
+        </form>
+        <input type="hidden" value="{{ type_title }}" id="typetext">
+       
+      
+       <script>  
+        if($("#typetext").val() == "티셔츠"){
+            $(".selectpattern2").css("display","block");
+            $(".selectpattern2").css("display","none");
+            $(".selectpattern3").css("display","none");
+        }
+        if($("#typetext").val() == "긴팔"){
+            $(".selectpattern").css("display","none");
+            $(".selectpattern2").css("display","block");
+            $(".selectpattern3").css("display","none");
+        }
+        if($("#typetext").val() == "후드티"){
+            $(".selectpattern3").css("display","block");
+            $(".selectpattern").css("display","none");
+            $(".selectpattern2").css("display","none");
+        }
+         
+
+        const elem = document.getElementById('panzoom-element');
+        const zoomInButton = document.getElementById('zoom-in');
+        const zoomOutButton = document.getElementById('zoom-out');
+        const resetButton = document.getElementById('reset');
+        const panzoom = Panzoom(elem);
+        const parent = elem.parentElement
+        // No function bind needed
+        parent.addEventListener('wheel', panzoom.zoomWithWheel);
+        
+          var _gaq = _gaq || [];
+          _gaq.push(['_setAccount', 'UA-36251023-1']);
+          _gaq.push(['_setDomainName', 'jqueryscript.net']);
+          _gaq.push(['_trackPageview']);
+        
+          (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+          })();
+        
+    
+        try {
+          fetch(new Request("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js", { method: 'HEAD', mode: 'no-cors' })).then(function(response) {
+            return true;
+          }).catch(function(e) {
+            var carbonScript = document.createElement("script");
+            carbonScript.src = "//cdn.carbonads.com/carbon.js?serve=CK7DKKQU&placement=wwwjqueryscriptnet";
+            carbonScript.id = "_carbonads_js";
+            document.getElementById("carbon-block").appendChild(carbonScript);
+          });
+        } catch (error) {
+          console.log(error);
+        }
+
+var img_L = 0;
+var img_T = 0;
+var targetObj;
+
+function getLeft(o){
+     return parseInt(o.style.left.replace('px', ''));
+}
+function getTop(o){
+     return parseInt(o.style.top.replace('px', ''));
+}
+
+// 이미지 움직이기
+function moveDrag(e){
+     var e_obj = window.event? window.event : e;
+     var dmvx = parseInt(e_obj.clientX + img_L);
+     var dmvy = parseInt(e_obj.clientY + img_T);
+     targetObj.style.left = dmvx +"px";
+     targetObj.style.top = dmvy +"px";
+     return false;
+}
+
+// 드래그 시작
+function startDrag(e, obj){
+     targetObj = obj;
+     var e_obj = window.event? window.event : e;
+     img_L = getLeft(obj) - e_obj.clientX;
+     img_T = getTop(obj) - e_obj.clientY;
+
+     document.onmousemove = moveDrag;
+     document.onmouseup = stopDrag;
+     if(e_obj.preventDefault)e_obj.preventDefault();
+}
+
+function stopDrag(){
+        document.onmousemove = null;
+        document.onmouseup = null;
+    }
+
+
+$("#imgwrap").on('change',function(){
+    $("#uploadimg").css("display","block");
+    ext = $(this).val().split('.').pop().toLowerCase(); //확장자
+    if($.inArray(ext, ['gif','png','jpg','jpeg']) == -1) {
+        window.alert('이미지 파일이 아닙니다! (gif, png, jpg, jpeg 만 업로드 가능)');
+
+    }else {
+        file = $('#imgwrap').prop("files")[0];
+        blobURL = window.URL.createObjectURL(file);
+        $('#panzoom-element img').attr('src', blobURL);
+        $('#panzoom-element').slideDown(); //업로드한 이미지 미리보기 
+        {% comment %} $(this).slideUp(); {% endcomment %}
+        {% comment %} console.log($("#imgwrap").files); {% endcomment %}
+    }
+});
+
+          
+
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+
+    
+    $("#selectpattern").change(function(){
+        if($("#selectpattern").val() == "p1"){
+            patternimg_wrap.style.display = "none"
+        }
+        else if($("#selectpattern").val() == "0"){
+            patternimg_wrap.style.display = "none"
+        }
+        else{
+            patternimg_wrap.style.display = "block"
+            patternimg.setAttribute('src',$("#selectpattern").val())
+        }
+    })
+
+    $("#selectpattern2").change(function(){
+        if($("#selectpattern2").val() == "p1"){
+            patternimg_wrap.style.display = "none"
+        }
+        else if($("#selectpattern2").val() == "0"){
+            patternimg_wrap.style.display = "none"
+        }
+        else{
+            patternimg_wrap.style.display = "block"
+            patternimg.setAttribute('src',$("#selectpattern2").val())
+        }
+    })
+
+    $("#selectpattern3").change(function(){
+        if($("#selectpattern3").val() == "p1"){
+            patternimg_wrap.style.display = "none"
+        }
+        else if($("#selectpattern3").val() == "0"){
+            patternimg_wrap.style.display = "none"
+        }
+        else{
+            patternimg_wrap.style.display = "block"
+            patternimg.setAttribute('src',$("#selectpattern3").val())
+        }
+    })
+
+    $("[name='text_input']").change(function(){
+        if($(this).val() == ""){
+            $("[name='t_input']").val("0");
+        }else{
+            $("[name='t_input']").val("1");
+        }
+    }); 
+    
+    $("input[type=file]").on('change', function(){
+        if($(this)[0].files.length === 0 ){
+            $("#input_image").val("0");
+        }else{
+            $("#input_image").val("1");
+        }
+    })
+    
+        
+  
+   $("#CustomBtn2").on("click",function(){
+            html2canvas(document.querySelector("#parent")).then(canvas => {
+            $("[name='file_base']").val(canvas.toDataURL('image/png'))
+            $("#file_base").submit();
+        })
+        
+    }); 
+
+    
+    function saveAs(uri, filename){
+        var link = document.createElement('a');
+        if(typeof link.download === 'string'){
+            link.href = uri;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }else{
+            window.open(uri);
+        }
+    }
+
+    
+
+});
+</script>
+{% endblock %}

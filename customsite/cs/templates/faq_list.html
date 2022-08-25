@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/cs.css' %}?ver=1">
+<script src="{% static 'js/cs.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        $(".question").click(function () {
+            $(this).next(".answer").toggle();
+        });
+
+
+        $("#btn_filter").children().each(function () {
+            $(this).click(function () {
+                $("[name='keyword']").val($(this).val())
+                $('#keyword_btn')[0].submit();
+            })
+        })
+    });
+</script>
+{% endblock %}
+
+{% block contents %}
+<div style="margin-top: 80px;">
+<h2>FAQ</h2>
+<h6>검색 후 문의가 해결되지 않으면 1:1 문의를 이용해주세요.</h6>
+<hr>
+</div>
+<br><br>
+<table class="table table-hover">
+    <thead>
+        <form action="." method="GET" id="keyword_btn">
+            <div class='text-center'>
+                <input type="text" id="keyword" placeholder="궁금한점을 검색해보세요" name="keyword"
+                    style="width:30%; height: 38px;">
+                <button type="submit" class="btn btn-outline-dark">검색</button>
+            </div>
+            <br>
+            <div class='text-center' style="margin: top 50px" id="btn_filter">
+                <input type="button" class="btn btn-outline-dark" value="주문" style="margin-right:50px; width: 85px;">
+                <input type="button" class="btn btn-outline-dark" value="결제" style="margin-right:50px; width: 85px;">
+                <input type="button" class="btn btn-outline-dark" value="환불" style="margin-right:50px; width: 85px;">
+                <input type="button" class="btn btn-outline-dark" value="배송" style="margin-right:50px; width: 85px;">
+                <input type="button" class="btn btn-outline-dark" value="적립금" style="margin-right:50px; width: 85px;">
+            </div>
+    </thead>
+    <br>
+    <tbody>
+        {% if all_faqs %}
+            {% for faq in faqs %}
+                {% if session.admin %}
+                    <tr onclick="location.href='{% url 'Cs:faq_detail' faq.id %}'" style="cursor: pointer;">
+                        <td>Q</td>
+                        <td>{{ faq.title }}</td>
+                    </tr>
+                {% else %}
+                    <tr class="question" style="cursor: pointer;">
+                        <td>Q</td>
+                        <td>{{ faq.title }}</td>
+                    </tr>
+                    <tr class="answer" style="display: none; background-color: #fff1db; height: 100px;">
+                        <td>A</td>
+                        <td><pre>{{ faq.content }}</pre></td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            {% if not keyword %}
+            <tr>
+                <td colspan="3">
+                    일치하는 검색 결과가 없습니다.
+                </td>
+            </tr>
+            {% endif %}
+        {% endif %}
+    </tbody>
+
+</table>
+</form>
+
+<div class="row">
+    <div class="col-12">
+        {% if session.admin %}
+        {% csrf_token %}
+        <a class="btn btn-dark" href="{% url 'Cs:faq_write' %}" style="float: right;">작성하기</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-2" style="margin:80px;">
+    <div class="col-12">
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if faqs.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?p={{faqs.previous_page_number}}">이전으로</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link disabled" href="#">이전으로</a>
+                </li>
+                {% endif %}
+                <li class="page-item active">
+                    <a class="page-link" href="#">{{faqs.number}} / {{faqs.paginator.num_pages }}</a>
+                </li>
+                {% if faqs.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?p={{faqs.next_page_number}}">다음으로</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link disabled" href="#">다음으로</a>
+                </li>
+                {% endif %}
+
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+{% endblock %}

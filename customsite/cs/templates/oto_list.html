@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/cs.css' %}?ver=1">
+<script src="{% static 'js/cs.js' %}"></script>
+{% endblock %}
+
+{% block contents %}
+<div style="margin-top: 80px;">
+<h2>1:1 문의</h2>
+{% if session.admin %}
+<h6>1:1 문의에 답변해주세요</h6>
+{% else %}
+<h6>내가 작성한 1:1 문의입니다.</h6>
+{% endif %}
+<hr>
+</div>
+<div class="mb-3 mt-3 clearfix">
+    <span class="float-start me-2">총 {{ otos.paginator.count }}개</span>
+    <span class="float-start">page {{ otos.number }}/{{ otos.paginator.num_pages }}</span>
+</div>
+
+<table class="table table-hover">
+    <thead class="table-success">
+        <tr>
+            <th>목록</th>
+            <th>제목</th>
+            <th>작성일</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for oto in otos %}
+        {% if session.admin %}
+        <tr onclick="location.href='{% url 'Cs:oto_detail' oto.id %}'" style="cursor: pointer;">
+            <td>{{ oto.id }}</td>
+            <td>{{ oto.title }}</a></td>
+            <td>{{ oto.reg_date|date:"Y-m-d" }}</td>
+        </tr>
+        {% endif %}
+        {% if session.user == oto.user_id %}
+        <tr onclick="location.href='{% url 'Cs:oto_detail' oto.id %}'" style="cursor: pointer;">
+            <td>{{ oto.id }}</td>
+            <td>{{ oto.title }}</a></td>
+            <td>{{ oto.reg_date|date:"Y-m-d" }}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+<div class="row">
+    <div class="col-12">
+        {% if not session.admin %}
+        <a class="btn btn-dark" href="{% url 'Cs:oto_write' %}" style="float: right;">문의하기</a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- pagination -->
+<div class="row mt-2" style="margin:80px;">
+    <div class="col-12">
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if otos.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?p={{otos.previous_page_number}}">이전으로</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link disabled" href="#">이전으로</a>
+                </li>
+                {% endif %}
+                <li class="page-item active">
+                    <a class="page-link" href="#">{{otos.number}} / {{otos.paginator.num_pages }}</a>
+                </li>
+                {% if otos.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?p={{otos.next_page_number}}">다음으로</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link disabled" href="#">다음으로</a>
+                </li>
+                {% endif %}
+
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endblock %}

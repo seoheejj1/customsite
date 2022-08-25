@@ -1,0 +1,811 @@
+{% extends 'base.html' %}
+
+
+{% block attachment %}
+    {% load static %}
+    <style>
+        #greet {
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            opacity: 0;
+        }
+
+        #greet button {
+            bottom: 35%;
+        }
+
+        #home_navigator {
+            position: fixed;
+            right: 0;
+        }
+
+        #home_navigator > div > ul li {
+            margin-top: 5px;
+            font-weight: bold;
+            border-radius: 10px;
+            padding: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        #home_navigator > div > ul li:hover {
+            background-color: #fff;
+            color: #000;
+        }
+
+        #contents_nav li a {
+            color: #fff;
+        }
+
+        #event_link a {
+            transition: all 0.2s ease-in-out;
+        }
+
+        #event_link a:hover {
+            color: red;
+            transform: scale(110%);
+        }
+
+        #best_desc4 {
+            width: 100%;
+            background-image: url("https://t1.daumcdn.net/cfile/tistory/99A0A6415C9B624B2C");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 30rem;
+        }
+
+        #best_desc2 select {
+            border: none;
+            outline: none;
+            font-size: 30px;
+        }
+
+        #best_desc2 select:focus {
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        #best_desc2 select option {
+            border-radius: 20px;
+        }
+
+        #best_desc2 select option:hover {
+            background-color: #fff;
+            color: #262626
+        }
+
+        .list-group-item {
+            cursor: pointer;
+        }
+
+        .list-group-item:hover {
+            background-color: lightblue;
+        }
+
+        .map_wrap {
+            overflow: hidden;
+        }
+
+        /* 지도위에 로드뷰의 위치와 각도를 표시하기 위한 map walker 아이콘의 스타일 */
+        .MapWalker {
+            position: absolute;
+            margin: -26px 0 0 -51px
+        }
+
+        .MapWalker .figure {
+            position: absolute;
+            width: 25px;
+            left: 38px;
+            top: -2px;
+            height: 39px;
+            background: url(https://t1.daumcdn.net/localimg/localimages/07/2018/pc/roadview_minimap_wk_2018.png) -298px -114px no-repeat
+        }
+
+        .MapWalker .angleBack {
+            width: 102px;
+            height: 52px;
+            background: url(https://t1.daumcdn.net/localimg/localimages/07/2018/pc/roadview_minimap_wk_2018.png) -834px -2px no-repeat;
+        }
+
+        .MapWalker.m0 .figure {
+            background-position: -298px -114px;
+        }
+
+        .MapWalker.m1 .figure {
+            background-position: -335px -114px;
+        }
+
+        .MapWalker.m2 .figure {
+            background-position: -372px -114px;
+        }
+
+        .MapWalker.m3 .figure {
+            background-position: -409px -114px;
+        }
+
+        .MapWalker.m4 .figure {
+            background-position: -446px -114px;
+        }
+
+        .MapWalker.m5 .figure {
+            background-position: -483px -114px;
+        }
+
+        .MapWalker.m6 .figure {
+            background-position: -520px -114px;
+        }
+
+        .MapWalker.m7 .figure {
+            background-position: -557px -114px;
+        }
+
+        .MapWalker.m8 .figure {
+            background-position: -2px -114px;
+        }
+
+        .MapWalker.m9 .figure {
+            background-position: -39px -114px;
+        }
+
+        .MapWalker.m10 .figure {
+            background-position: -76px -114px;
+        }
+
+        .MapWalker.m11 .figure {
+            background-position: -113px -114px;
+        }
+
+        .MapWalker.m12 .figure {
+            background-position: -150px -114px;
+        }
+
+        .MapWalker.m13 .figure {
+            background-position: -187px -114px;
+        }
+
+        .MapWalker.m14 .figure {
+            background-position: -224px -114px;
+        }
+
+        .MapWalker.m15 .figure {
+            background-position: -261px -114px;
+        }
+
+        .MapWalker.m0 .angleBack {
+            background-position: -834px -2px;
+        }
+
+        .MapWalker.m1 .angleBack {
+            background-position: -938px -2px;
+        }
+
+        .MapWalker.m2 .angleBack {
+            background-position: -1042px -2px;
+        }
+
+        .MapWalker.m3 .angleBack {
+            background-position: -1146px -2px;
+        }
+
+        .MapWalker.m4 .angleBack {
+            background-position: -1250px -2px;
+        }
+
+        .MapWalker.m5 .angleBack {
+            background-position: -1354px -2px;
+        }
+
+        .MapWalker.m6 .angleBack {
+            background-position: -1458px -2px;
+        }
+
+        .MapWalker.m7 .angleBack {
+            background-position: -1562px -2px;
+        }
+
+        .MapWalker.m8 .angleBack {
+            background-position: -2px -2px;
+        }
+
+        .MapWalker.m9 .angleBack {
+            background-position: -106px -2px;
+        }
+
+        .MapWalker.m10 .angleBack {
+            background-position: -210px -2px;
+        }
+
+        .MapWalker.m11 .angleBack {
+            background-position: -314px -2px;
+        }
+
+        .MapWalker.m12 .angleBack {
+            background-position: -418px -2px;
+        }
+
+        .MapWalker.m13 .angleBack {
+            background-position: -522px -2px;
+        }
+
+        .MapWalker.m14 .angleBack {
+            background-position: -626px -2px;
+        }
+
+        .MapWalker.m15 .angleBack {
+            background-position: -730px -2px;
+        }
+
+        .customoverlay {
+            position: relative;
+            bottom: 85px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            border-bottom: 2px solid #ddd;
+            float: left;
+        }
+
+        .customoverlay:nth-of-type(n) {
+            border: 0;
+            box-shadow: 0px 1px 2px #888;
+        }
+
+        .customoverlay a {
+            display: block;
+            text-decoration: none;
+            color: #000;
+            text-align: center;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            overflow: hidden;
+            background: #d95050;
+            background: #d95050 url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/arrow_white.png) no-repeat right 14px center;
+        }
+
+        .customoverlay .title {
+            display: block;
+            text-align: center;
+            background: #fff;
+            margin-right: 35px;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .customoverlay:after {
+            content: '';
+            position: absolute;
+            margin-left: -12px;
+            left: 50%;
+            bottom: -12px;
+            width: 22px;
+            height: 12px;
+            background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/vertex_white.png')
+        }
+    </style>
+    
+    <script>
+        $(function () {
+            $("#greet h1").hide();
+            $("#greet button").hide();
+            $("#best_desc2").hide();
+            $("#best_desc3").hide();
+            $("#best_desc4").hide();
+            $("#introduce").css('backgroundColor', '#fff')
+            $("#introduce").children()[0].style.color = "#262626"
+
+            // greeter
+            $("#greet").animate({ opacity: 1 }, 'slow', function () {
+                $("#greet h1").show();
+                var $typing = $("#typing");
+                var text = $typing.text();
+                $typing.html("");
+                var chars = text.split("");
+                chars.forEach(function (item) {
+                    item = (item == " ") ? "&nbsp" : item;
+
+                    $("<span></span>").html(item).appendTo($typing);
+                });
+                var $caret = $("<span></span>").attr("id", "caret").css({
+                    width: "0.4em",
+                }).appendTo($typing);
+                var delayStart = 600;
+                var speed = 120;
+                $typing.children(":not(#caret)").hide().each(function (index) {
+                    var delay = delayStart + speed * index;
+
+                    $(this).delay(delay).show(10);
+                });
+            });
+            $("#greet button").delay(5000).fadeIn("slow");
+            $("#greet button").click(function () {
+                $("#greet").animate({ opacity: 0 }, 'slow', function () {
+                    $("#greet").css({zIndex: "-100"});
+                });
+            })
+            
+            // Home Navigator
+            $(window).scroll(function () {
+                if ($("#scrollspyHeading1").offset().top > window.pageYOffset) {
+                    $("#contents_nav li").css('backgroundColor', '#262626')
+                    $("#contents_nav li a").css('color', '#fff')
+                    $("#introduce").css('backgroundColor', '#fff')
+                    $("#introduce").children()[0].style.color = "#262626"
+                } else if ($("#scrollspyHeading2").offset().top > window.pageYOffset) {
+                    $("#contents_nav li").css('backgroundColor', '#262626')
+                    $("#contents_nav li a").css('color', '#fff')
+                    $("#event").css('backgroundColor', '#fff')
+                    $("#event").children()[0].style.color = "#262626"
+                } else if ($("#scrollspyHeading3").offset().top > window.pageYOffset) {
+                    $("#contents_nav li").css('backgroundColor', '#262626')
+                    $("#contents_nav li a").css('color', '#fff')
+                    $("#best").css('backgroundColor', '#fff')
+                    $("#best").children()[0].style.color = "#262626"
+                } else if ($("#scrollspyHeading4").offset().top > window.pageYOffset) {
+                    $("#contents_nav li").css('backgroundColor', '#262626')
+                    $("#contents_nav li a").css('color', '#fff')
+                    $("#notice").css('backgroundColor', '#fff')
+                    $("#notice").children()[0].style.color = "#262626"
+                } else if ($("#scrollspyHeading5").offset().top > window.pageYOffset) {
+                    $("#contents_nav li").css('backgroundColor', '#262626')
+                    $("#contents_nav li a").css('color', '#fff')
+                    $("#roadmap").css('backgroundColor', '#fff')
+                    $("#roadmap").children()[0].style.color = "#262626"
+                }
+            })
+
+            // BEST
+            $("#tag_selector").children()[0].selected = true
+
+            $("#best_btn button").click(function () {
+                $("#best_btn button").css("border", "3px solid #fff").css("backgroundColor", "#262626").css("color", "#fff");
+                $("#best_btn button").each(function () {
+                    this.disabled = false;
+                })
+                $(this).css("border", "3px solid #262626").css("backgroundColor", "#fff").css("color", "#262626");
+                $(this)[0].disabled = true;
+
+                if ($(this).text() == "BEST 코디") {
+                    $("#best_img").hide();
+                    $("#best_img img").attr("src", $("#best_cody_img").val())
+                    $("#best_img a").attr("href", $("#best_cody_url").val())
+                    $("#best_img").fadeIn();
+                    $("#best_desc").children().each(function () {
+                        $(this).hide();
+                    })
+                    $("#best_desc1").fadeIn();
+
+                } else if ($(this).text() == "BEST 태그") {
+                    $("#best_img").hide();
+                    $("#best_img img").attr("src", $("#tag_selector").val())
+                    $("#best_img a").attr("href", $("#best_tag_url").val())
+                    $("#best_img").fadeIn();
+                    $("#best_desc").children().each(function () {
+                        $(this).hide();
+                    })
+                    $("#best_desc2").fadeIn();
+                    
+                } else if ($(this).text() == "BEST 포토후기") {
+                    $("#best_img").hide();
+                    $("#best_img img").attr("src", $("#best_photo_img").val())
+                    $("#best_img a").attr("href", $("#best_photo_url").val())
+                    $("#best_img").fadeIn();
+                    $("#best_desc").children().each(function () {
+                        $(this).hide();
+                    })
+                    $("#best_desc3").fadeIn();
+                    
+                } else if ($(this).text() == "이달의 판매왕") {
+                    $("#best_img").hide();
+                    $("#best_desc").children().each(function () {
+                        $(this).hide();
+                    })
+                    $("#best_desc4").fadeIn();
+                }
+            })
+            
+            $("#tag_selector").change(function () {
+                $("#best_img img").hide();
+                $("#best_img img").attr("src", $(this).val()[0]);
+                $("#best_img img").fadeIn();
+                $(this).children().each(function () {
+                    if ($(this)[0].selected) {
+                        $("#best_img a").attr("href", `/whitevalley/shopping/finished_detail/${$(this).attr('id')}/`)     
+                    }
+                })
+            })
+
+            // img hover
+            $("#best_img").on('mouseenter', function () {
+                $(this).animate({opacity: 0.7}, 100)
+            })
+            $("#best_img").on('mouseleave', function () {
+                $(this).animate({opacity: 1}, 100)
+            })
+
+
+            // kakaomap
+            function MapWalker(position){
+
+                //커스텀 오버레이에 사용할 map walker 엘리먼트
+                var content = document.createElement('div');
+                var figure = document.createElement('div');
+                var angleBack = document.createElement('div');
+
+                //map walker를 구성하는 각 노드들의 class명을 지정 - style셋팅을 위해 필요
+                content.className = 'MapWalker';
+                figure.className = 'figure';
+                angleBack.className = 'angleBack';
+
+                content.appendChild(angleBack);
+                content.appendChild(figure);
+
+                //커스텀 오버레이 객체를 사용하여, map walker 아이콘을 생성
+                var walker = new kakao.maps.CustomOverlay({
+                    position: position,
+                    content: content,
+                    yAnchor: 1
+                });
+
+                this.walker = walker;
+                this.content = content;
+            }
+
+            //로드뷰의 pan(좌우 각도)값에 따라 map walker의 백그라운드 이미지를 변경 시키는 함수
+            //background로 사용할 sprite 이미지에 따라 계산 식은 달라 질 수 있음
+            MapWalker.prototype.setAngle = function(angle){
+
+                var threshold = 22.5; //이미지가 변화되어야 되는(각도가 변해야되는) 임계 값
+                for(var i=0; i<16; i++){ //각도에 따라 변화되는 앵글 이미지의 수가 16개
+                    if(angle > (threshold * i) && angle < (threshold * (i + 1))){
+                        //각도(pan)에 따라 아이콘의 class명을 변경
+                        var className = 'm' + i;
+                        this.content.className = this.content.className.split(' ')[0];
+                        this.content.className += (' ' + className);
+                        break;
+                    }
+                }
+            };
+
+            //map walker의 위치를 변경시키는 함수
+            MapWalker.prototype.setPosition = function(position){
+                this.walker.setPosition(position);
+            };
+
+            //map walker를 지도위에 올리는 함수
+            MapWalker.prototype.setMap = function(map){
+                this.walker.setMap(map);
+            };
+
+            var mapCenter = new kakao.maps.LatLng(33.450701, 126.570667)
+            var container = document.getElementById('map');
+            var options = {
+                center: mapCenter,
+                level: 3
+            };
+
+            var map = new kakao.maps.Map(container, options);
+            var mapTypeControl = new kakao.maps.MapTypeControl();
+            map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+            var zoomControl = new kakao.maps.ZoomControl();
+            map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+            var imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
+            imageSize = new kakao.maps.Size(64, 69),
+            imageOption = {offset: new kakao.maps.Point(27, 69)};
+            
+            var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption),
+                markerPosition = mapCenter;
+
+            // 마커를 생성합니다
+            var marker = new kakao.maps.Marker({
+                position: markerPosition, 
+                image: markerImage
+            });
+            marker.setMap(map);
+
+            var content = '<div class="customoverlay">' +
+                '  <a href="https://map.kakao.com/link/map/33.450701,126.570667" target="_blank">' +
+                '    <span class="title">WHITE VALLEY</span>' +
+                '  </a>' +
+                '</div>';
+
+            // 커스텀 오버레이가 표시될 위치입니다 
+            var position = mapCenter;  
+
+            // 커스텀 오버레이를 생성합니다
+            var customOverlay = new kakao.maps.CustomOverlay({
+                map: map,
+                position: position,
+                content: content,
+                yAnchor: 1 
+            });
+
+            map.addOverlayMapTypeId(kakao.maps.MapTypeId.ROADVIEW);
+
+        var roadviewContainer = document.getElementById('roadview'); // 로드뷰를 표시할 div
+        var roadview = new kakao.maps.Roadview(roadviewContainer); // 로드뷰 객체
+        var roadviewClient = new kakao.maps.RoadviewClient(); // 좌표로부터 로드뷰 파노ID를 가져올 로드뷰 helper객체
+
+            
+        // 지도의 중심좌표와 가까운 로드뷰의 panoId를 추출하여 로드뷰를 띄운다.
+        roadviewClient.getNearestPanoId(mapCenter, 50, function(panoId) {
+            roadview.setPanoId(panoId, mapCenter); // panoId와 중심좌표를 통해 로드뷰 실행
+        });
+
+        var mapWalker = null;
+
+        // 로드뷰의 초기화 되었을때 map walker를 생성한다.
+        kakao.maps.event.addListener(roadview, 'init', function() {
+
+            // map walker를 생성한다. 생성시 지도의 중심좌표를 넘긴다.
+            mapWalker = new MapWalker(mapCenter);
+            mapWalker.setMap(map); // map walker를 지도에 설정한다.
+
+            // 로드뷰가 초기화 된 후, 추가 이벤트를 등록한다.
+            // 로드뷰를 상,하,좌,우,줌인,줌아웃을 할 경우 발생한다.
+            // 로드뷰를 조작할때 발생하는 값을 받아 map walker의 상태를 변경해 준다.
+            kakao.maps.event.addListener(roadview, 'viewpoint_changed', function(){
+
+                // 이벤트가 발생할 때마다 로드뷰의 viewpoint값을 읽어, map walker에 반영
+                var viewpoint = roadview.getViewpoint();
+                mapWalker.setAngle(viewpoint.pan);
+
+            });
+
+            // 로드뷰내의 화살표나 점프를 하였을 경우 발생한다.
+            // position값이 바뀔 때마다 map walker의 상태를 변경해 준다.
+            kakao.maps.event.addListener(roadview, 'position_changed', function(){
+
+                // 이벤트가 발생할 때마다 로드뷰의 position값을 읽어, map walker에 반영 
+                var position = roadview.getPosition();
+                mapWalker.setPosition(position);
+                map.setCenter(position);
+
+            });
+            });
+        })
+
+    </script>
+{% endblock %}
+
+{% block contents %}
+    {% if not cookies.visited %}
+        <div id="greet" style="z-index: 30;" class="text-white position-fixed d-flex flex-column justify-content-center align-items-center">
+            <h1 id="typing">WELCOME TO WHITEVALLEY!</h1>
+            <button class="btn btn-outline-light position-absolute">Continue</button>
+        </div>
+    {% endif %}
+
+    <div class="d-flex">
+        <div class="scrollspy-example w-75" data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-offset="0" tabindex="0" id="contents" style="outline: none">
+            <div class="container" id="scrollspyHeading1">
+                <div class="border rounded p-5 bg-dark row">
+                    <div id="carouselExampleIndicators" class="carousel slide col-sm d-flex align-items-center" data-bs-ride="carousel">
+                        <div class="carousel-indicators">
+                            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        </div>
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                            <img src="{% static 'image/main_img_1.jpg' %}" class="d-block w-100" alt="cloth1">
+                            </div>
+                            <div class="carousel-item">
+                            <img src="{% static 'image/main_img_2.jpeg' %}" class="d-block w-100" alt="cloth2">
+                            </div>
+                            <div class="carousel-item">
+                            <img src="{% static 'image/main_img_3.jpg' %}" class="d-block w-100" alt="cloth3">
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <div class="col-sm d-flex justify-content-center align-items-center flex-end mt-1">
+                        <div class="w-75 p-3 text-light rounded">
+                            <h3 class="mb-3">Catch Your Cloth Desired</h3>
+                            <a href="{% url 'Order:order' %}"><button class="btn btn-outline-primary">Go To Custom Page</button></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="rounded p-5" id="scrollspyHeading2">
+                <div class="container">
+                    <div class="row text-center">
+                        <div class="col-sm d-flex flex-column align-items-center justify-content-evenly" id="event_link">
+                            <h2><strong>OPEN EVENT</strong></h2>
+                            {% if session.user %}
+                                <a href="{% url 'Order:order' %}" class="link-dark text-decoration-none"><h5>1. 회원가입 시 적립금 {{ config.sign_point }}원!</h5></a>
+                            {% else %}
+                                <a href="{% url 'User:user_login' %}" class="link-dark text-decoration-none"><h5>1. 회원가입 시 적립금 {{ config.sign_point }}원!</h5></a>
+                            {% endif %}
+                            <a href="{% url 'Order:order' %}" class="link-dark text-decoration-none"><h5>2. 물품 구매 시 {{ config.return_point }}%!</h5></a>
+                            <a href="{% url 'Recommendation:reviews' %}" class="link-dark text-decoration-none"><h5>3. 포토후기 작성 시 {{ config.review_point }}원!</h5></a>
+                            <a href="{% url 'Order:order' %}" class="link-dark text-decoration-none"><h5>4. 매월 1일 판매왕에게는 {{ config.best_point }}원!</h5></a>
+                        </div>
+                        <div class="col-sm">
+                            <img class="w-75" src="https://cdn-icons-png.flaticon.com/512/3081/3081840.png" alt="" srcset="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="rounded p-5 bg-dark text-white" id="scrollspyHeading3">
+                <div class="d-flex justify-content-evenly mb-5" id="best_btn">
+                    <button class="w-25 btn border-2 btn-outline-light" disabled>BEST 코디</button>
+                    <button class="w-25 btn border-2 btn-outline-light">BEST 태그</button>
+                    <button class="w-25 btn border-2 btn-outline-light">BEST 포토후기</button>
+                    <button class="w-25 btn border-2 btn-outline-light">이달의 판매왕</button>
+                </div>
+                <div class="container" id="best_contents">
+                    <div class="row">
+                        <div class="col-sm" id="best_img">
+                            <div class="h-100 d-flex justify-content-center align-items-center">
+                                <input type="hidden" value="{{ best_cody.img }}" id="best_cody_img">
+                                {% if best_cody != "완성품없음" %}
+                                    <input type="hidden" value="{% url 'Recommendation:finished_detail' best_cody.id %}" id="best_cody_url">
+                                {% endif %}
+                                {% if first_tag != "태그없음" %}
+                                    <input type="hidden" value="{% url 'Recommendation:finished_detail' first_tag.id %}" id="best_tag_url">
+                                {% endif %}
+                                <input type="hidden" value="{{ best_review_img }}" id="best_photo_img">
+                                {% if best_review != "리뷰없음" %}
+                                    <input type="hidden" value="{% url 'Recommendation:reviews_detail' best_review.id %}" id="best_photo_url">
+                                {% endif %}
+                                {% if best_cody != "완성품없음" %}
+                                    <a href="{% url 'Recommendation:finished_detail' best_cody.id %}"><img class="w-100" src="{{ best_cody.img }}" alt="best코디"></a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-sm d-flex flex-column justify-content-center" id="best_desc">
+                            <div id="best_desc1">
+                                {% if best_cody != "완성품없음" %}
+                                    <h2>{{ best_cody.user }}님의 작품</h2>
+                                    <hr>
+                                    <ul class="list-unstyled">
+                                        <li><strong><옵션></strong></li>
+                                        <li>종류: {{ best_cody.type }}</li>
+                                        <li>사이즈: {{ best_cody.size }}</li>
+                                        <li>태그: {{ best_cody_tag.name }}</li>
+                                    </ul>
+                                    <hr>
+                                    <h5>조회수: {{ best_cody.view_cnt }}</h5>
+                                    <h5>판매횟수: {{ best_cody_count }} </h5>
+                                    <h5>디자인날짜: {{ best_cody.reg_date | date:"Y년 m월 d일" }}</h5>
+                                {% else %}
+                                    <h1>완성품 없음</h1>
+                                {% endif %}
+                            </div>
+                            <div id="best_desc2" class="h-100">
+                                <select class="form-select h-100 text-center bg-dark text-light" id="tag_selector" size="5" multiple aria-label="multiple select example">
+                                    {% for name, product in all_tags %}
+                                        <option class="p-3" value="{{ product.img }}" id="{{ product.id }}">{{ name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div id="best_desc3">
+                                <h4>{{ best_review.order.user.nickname }}님의 후기</h4>
+                                <hr>
+                                <h5>{{ best_review.title }}</h5>
+                                <h5>{{ best_review.contents | truncatechars:"10" }}</h5>
+                                <hr>
+                                <h5>디자이너: {{ best_review.order.product.user.nickname }}</h5>
+                                <h5>태그: {{ best_review_tag.name }}</h5>
+                                <h5>종류: {{ best_review.order.product.type.title }}</h5>
+                                <h5>사이즈: {{ best_review.order.product.size }}</h5>
+                                <h5>조회수: {{ best_review.view_cnt }}</h5>
+                                <h5>작성일: {{ best_review.reg_date | date:"Y-m-d H:i:s" }}</h5>
+                                {% if best_review != "리뷰없음" %}
+                                    <a class="btn btn-outline-light w-100 mt-5" href="{% url 'Recommendation:finished_detail' best_review.order.product.id %}">구매하러 가기</a>
+                                {% endif %}
+                                
+                            </div>
+                            <div id="best_desc4">
+                                <div class="col-sm d-flex flex-column justify-content-center align-items-center h-100">
+                                    <div class="text-center">
+                                        {% if best_seller != "셀러없음" %}
+                                            <h1>{{ best_seller.0 }}님</h1>
+                                            <h4>상품 총 매출(누적)</h4>
+                                            <hr>
+                                            <h1><strong>￦{{ best_seller.1 }}</strong></h1>
+                                        {% else %}
+                                            <h1>User or Order or Product Data is Empty</h1>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <h6 class="text-danger mt-2">* 해당 내용은 실시간으로 갱신됩니다.</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="rounded row p-5" id="scrollspyHeading4">
+                <div class="border border-3 rounded mb-3 p-5 col-sm">
+                    <h1><strong>공지사항</strong></h1>
+                    <hr>
+                    <ul class="list-group list-group-flush rounded">
+                        {% for notice in notices %}
+                            <li class="list-group-item" onclick="location.href='{% url 'Cs:notice_detail' notice.id %}'">{{ notice.title }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="col-sm">
+                    <div class="border border-3 rounded mb-3 p-5 col-sm">
+                        <h1><strong>FAQ</strong></h1>
+                        <hr>
+                        <ul class="list-group list-group-flush">
+                            {% for faq in faqs %}
+                                <li class="list-group-item" onclick="location.href='{% url 'Cs:faq_detail' faq.id %}'">{{ faq.title }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="border border-3 rounded mb-3 p-5 col-sm">
+                        <h1><strong>매거진</strong></h1>
+                        <hr>
+                        <ul class="list-group list-group-flush">
+                            {% for magazine in magazines %}
+                                <li class="list-group-item" onclick="location.href='{% url 'User:magazine_detail' magazine.id %}'">{{ magazine.title }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="border rounded p-5 bg-dark mb-3 text-white" id="scrollspyHeading5">
+                <div class="map_wrap">
+                    <hr>
+                    <h3>매장위치</h3>
+                    <hr>
+                    <div id="mapWrapper" style="width:100%; height:400px;">
+                        <div id="map" style="width:100%;height:100%"></div>
+                    </div>
+                    <hr>
+                    <h3>로드뷰</h3>
+                    <hr>
+                    <div id="rvWrapper" style="width:100%; height:400px;">
+                        <div id="roadview" style="width:100%;height:100%"></div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <button class="col-sm btn btn-outline-light border-3 fw-bold" onclick="location.href='https://map.kakao.com/link/map/18577297'">맵에서 보기</button>
+                    <button class="col-sm btn btn-outline-light border-3 fw-bold" onclick="location.href='https://map.kakao.com/link/to/18577297'">맵에서 길찾기</button>
+                    <button class="col-sm btn btn-outline-light border-3 fw-bold" onclick="location.href='https://map.kakao.com/link/roadview/18577297'">맵에서 로드뷰 보기</button>
+                    <button class="col-sm btn btn-outline-light border-3 fw-bold" onclick="location.href='https://map.kakao.com/link/search/whitevalley'">맵에서 검색결과 보기</button>
+                </div>
+                <hr>
+            </div>
+        </div>
+        <div class="w-25 d-flex justify-content-center align-items-center h-75" id="home_navigator">
+            <div style="border-radius: 25px;" class="p-3 text-center bg-dark border border-3 border-light text-white d-flex align-items-center">
+                <nav id="navbar-example2" class="navbar navbar-dark bg-dark px-3">
+                    <ul class="nav d-flex flex-column" id="contents_nav">
+                        <li class="nav-item" id="introduce">
+                            <a class="nav-link" href="#scrollspyHeading1">INTRODUCE</a>
+                        </li>
+                        <li class="nav-item" id="event">
+                            <a class="nav-link" href="#scrollspyHeading2">EVENT</a>
+                        </li>
+                        <li class="nav-item" id="best">
+                            <a class="nav-link" href="#scrollspyHeading3">BEST</a>
+                        </li>
+                        <li class="nav-item" id="notice">
+                            <a class="nav-link" href="#scrollspyHeading4">NOTICE</a>
+                        </li>
+                        <li class="nav-item" id="roadmap">
+                            <a class="nav-link" href="#scrollspyHeading5">ROADMAP</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d0a089899d52dada0e103d8ad4697d13"></script>
+{% endblock %}

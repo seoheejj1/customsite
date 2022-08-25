@@ -1,0 +1,309 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/7460690a88.js" crossorigin="anonymous"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+
+        body {
+            padding-top: 58px;
+        }
+
+        #nav_collapse ul li a {
+            border-bottom: 3px solid transparent;
+        }
+
+        #nav_collapse ul li a:hover {
+            border-bottom: 3px solid #fff;
+        }
+
+        a {
+            cursor: pointer;
+        }
+    </style>
+
+    <script>
+        $(function () {
+            // collapse 창
+            shopping_collapse = 0;
+            cs_collapse = 0;
+            $("#nav_shopping").on('click', function () {
+                $("#nav_collapse h1").text("SHOPPING");
+                $("#cs_links").hide();
+                $("#shopping_links").show();
+
+                if (cs_collapse == 0 && shopping_collapse == 0) {
+                    shopping_collapse += 1;
+                    $("#nav_collapse").slideDown();
+                } else if (cs_collapse == 1 && shopping_collapse == 0) {
+                    cs_collapse -= 1;
+                    shopping_collapse += 1;
+                } else if (cs_collapse == 0 && shopping_collapse == 1) {
+                    shopping_collapse -= 1;
+                    $("#nav_collapse").slideUp();
+                }
+            })
+            $("#nav_cs").on('click', function () {
+                $("#nav_collapse h1").text("CS");
+                $("#shopping_links").hide();
+                $("#cs_links").show();
+
+                if (cs_collapse == 0 && shopping_collapse == 0) {
+                    cs_collapse += 1;
+                    $("#nav_collapse").slideDown();
+                } else if (cs_collapse == 1 && shopping_collapse == 0) {
+                    cs_collapse -= 1;
+                    $("#nav_collapse").slideUp();
+                } else if (cs_collapse == 0 && shopping_collapse == 1) {
+                    shopping_collapse -= 1;
+                    cs_collapse += 1;
+                }
+            })
+            $("#collapse_exit").click(function () {
+                $("#nav_collapse").slideUp();
+                shopping_collapse = 0;
+                cs_collapse = 0;
+            })
+            $(".navbar-toggler").click(function () {
+                $("#nav_collapse").slideUp();
+                shopping_collapse = 0;
+                cs_collapse = 0;
+            })
+
+            // collpase 창 resize 시 slideup
+            $(window).resize(function () {
+                if (window.innerWidth < 991) {
+                    $("#nav_collapse").slideUp();
+                    shopping_collapse = 0;
+                    cs_collapse = 0;
+                };
+            });
+
+            // logout
+            $("#logout_btn").click(function () {
+                if (confirm("로그아웃 하시겠습니까?")) {
+                    $("#logout_form").submit();
+                }
+            })
+        })
+    </script>
+
+    <title>{{ config.site_name }}</title>
+    {% block attachment %}
+        <!-- 원하는 js, css 파일 -->
+    {% endblock %}
+</head>
+<body>
+    <div class="fixed-top">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand ms-3 fw-bold fs-4" href="{% url 'Main:home' %}">
+                    <i class="fa-solid fa-snowflake fa-spin"></i>
+                    {{ config.site_name }}
+                    <i class="fa-solid fa-snowflake fa-spin"></i>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav ms-3">
+                        <li class="nav-item" id="nav_shopping">
+                            {% if currentpage == 'shopping' %}
+                                <a class="nav-link active"><i class="fa-brands fa-shopify fa-beat-fade"></i>&nbsp SHOPPING</a>
+                            {% else %}
+                                <a class="nav-link"><i class="fa-brands fa-shopify"></i>&nbsp SHOPPING</a>
+                            {% endif %}
+                        </li>
+                        <li class="nav-item">
+                            {% if currentpage == 'magazine' %}
+                                <a class="nav-link active" href="{% url 'User:magazine_list' %}"><i class="fa-solid fa-book-open-reader fa-beat-fade"></i>&nbsp MAGAZINE</a>
+                            {% else %}
+                                <a class="nav-link" href="{% url 'User:magazine_list' %}"><i class="fa-solid fa-book-open-reader"></i>&nbsp MAGAZINE</a>
+                            {% endif %}
+                        </li>
+                        <li class="nav-item">
+                            {% if currentpage == 'cart' %}
+                                <a class="nav-link active" href="{% url 'Main:cart' %}"><i class="fa-solid fa-cart-shopping fa-beat-fade"></i>&nbsp CART</a>
+                            {% else %}
+                                <a class="nav-link" href="{% url 'Main:cart' %}"><i class="fa-solid fa-cart-shopping"></i>&nbsp CART</a>
+                            {% endif %}
+                        </li>
+                        <li class="nav-item" id="nav_cs">
+                            {% if currentpage == 'cs' %}
+                                <a class="nav-link active"><i class="fa-solid fa-headphones fa-beat-fade"></i>&nbsp C/S</a>
+                            {% else %}
+                                <a class="nav-link"><i class="fa-solid fa-headphones"></i>&nbsp C/S</a>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+                <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+                    <ul class="navbar-nav ms-3">
+                        <li class="nav-item me-3">
+                            {% if session.user %}
+                                <form action="{% url 'User:user_logout' %}" id="logout_form">
+                                    {% csrf_token %}
+                                    <a class="nav-link" id="logout_btn"><i class="fa-solid fa-power-off"></i>&nbsp LogOut</a>
+                                </form>
+                            {% else %}
+                                {% if currentpage == 'login' %}
+                                    <a class="nav-link active" href="{% url 'User:user_login' %}"><i class="fa-solid fa-door-open fa-beat-fade"></i>&nbsp LogIn</a>
+                                {% else %}
+                                    <a class="nav-link" href="{% url 'User:user_login' %}"><i class="fa-solid fa-door-open"></i>&nbsp LogIn</a>
+                                {% endif %}
+                            {% endif %}
+                        </li>
+                        <li class="nav-item">
+                            {% if session.admin %}
+                                {% if currentpage == 'admin' %}
+                                    <a class="nav-link active" href="{% url 'Main:admin' %}"><i class="fa-solid fa-gear fa-beat-fade"></i>&nbsp Manage</a>
+                                {% else %}
+                                    <a class="nav-link" href="{% url 'Main:admin' %}"><i class="fa-solid fa-gear"></i>&nbsp Manage</a>
+                                {% endif %}
+                            {% elif session.user %}
+                                {% if currentpage == 'mypage' %}
+                                    <a class="nav-link active" href="{% url 'User:mypage' %}"><i class="fa-solid fa-user fa-beat-fade"></i>&nbsp MyPage</a>
+                                {% else %}
+                                    <a class="nav-link" href="{% url 'User:mypage' %}"><i class="fa-solid fa-user"></i>&nbsp MyPage</a>
+                                {% endif %}
+                            {% else %}
+                                {% if currentpage == 'signin' %}
+                                    <a class="nav-link active" href="{% url 'User:user_register' %}"><i class="fa-solid fa-right-to-bracket fa-beat-fade"></i>&nbsp SignIn</a>
+                                {% else %}
+                                    <a class="nav-link" href="{% url 'User:user_register' %}"><i class="fa-solid fa-right-to-bracket"></i>&nbsp SignIn</a>
+                                {% endif %}
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div id="nav_collapse" style="display: none;">
+            <div style="border-radius: 25px;" class="container bg bg-dark text-white d-flex col-sm-12 h-100 border border-3 p-5">
+                <h1 class="d-flex justify-content-center align-items-center col-sm-5"></h1>
+                <div class="d-flex align-items-center col-sm-6">
+                    <ul class="list-unstyled navbar-nav w-75 text-start" id="shopping_links">
+                        <li class='nav-item'><a href="{% url 'Order:order' %}" class='nav-link text-decoration-none text-white mb-1'>커스텀주문</a></li>
+                        <li class='nav-item'><a href="{% url 'Recommendation:finished' %}" class='nav-link text-decoration-none text-white mb-1'>완성품</a></li>
+                        <li class='nav-item'><a href="{% url 'Recommendation:tag_reviews' %}" class='nav-link text-decoration-none text-white mb-1'>태그</a></li>
+                        <li class='nav-item'><a href="{% url 'Recommendation:reviews' %}" class='nav-link text-decoration-none text-white mb-1'>포토후기</a></li>
+                    </ul>
+                    <ul class="list-unstyled navbar-nav w-75 text-start" id="cs_links">
+                        <li class='nav-item'><a href="{% url 'Cs:notice_list' %}" class='nav-link text-decoration-none text-white mb-1'>공지사항</a></li>
+                        <li class='nav-item'><a href="{% url 'Cs:event_list' %}" class='nav-link text-decoration-none text-white mb-1'>이벤트</a></li>
+                        <li class='nav-item'><a href="{% url 'Cs:oto_list' %}" class='nav-link text-decoration-none text-white mb-1'>1:1문의</a></li>
+                        <li class='nav-item'><a href="{% url 'Cs:faq_list' %}" class='nav-link text-decoration-none text-white mb-1'>FAQ</a></li>
+                    </ul>
+                </div>
+                <div style="position-absolute col-sm-1">
+                    <button class="btn btn-danger" id="collapse_exit">X</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-3">
+        {% block contents %}
+            <!-- 원하는 내용 -->
+        {% endblock %}
+    </div>
+
+    <footer class="bg-dark text-center text-white">
+        <div class="container p-4">
+            <section class="mb-4">
+                <a class="btn btn-outline-light btn-floating m-1" href="http://www.facebook.com" role="button" target="_blank">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a class="btn btn-outline-light btn-floating m-1" href="http://www.twitter.com" role="button" target="_blank">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a class="btn btn-outline-light btn-floating m-1" href="http://www.google.com" role="button" target="_blank">
+                    <i class="fab fa-google"></i>
+                </a>
+                <a class="btn btn-outline-light btn-floating m-1" href="http://www.instagram.com" role="button" target="_blank">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a class="btn btn-outline-light btn-floating m-1" href="http://www.youtube.com" role="button" target="_blank">
+                    <i class="fab fa-youtube"></i>
+                </a>
+                <a class="btn btn-outline-light btn-floating m-1" href="http://www.github.com" role="button" target="_blank">
+                    <i class="fab fa-github"></i>
+                </a>
+            </section>
+            <section>
+                
+            </section>
+            <section class="mb-4">
+                <h1>{{ config.site_name }}</h1>
+                <h6>
+                    {{ config.sale_time }}<br>
+                    {{ config.lunch_time }}<br>
+                    {{ config.holiday }}
+                </h6>
+            </section>
+            <section class="">
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                        <h5 class="text-uppercase">ABOUT</h5>
+                        <ul class="list-unstyled mb-0">
+                            <li><a href="#!" class="text-white text-decoration-none">설립</a></li>
+                            <li><a href="#!" class="text-white text-decoration-none">주소</a></li>
+                            <li><a href="#!" class="text-white text-decoration-none">지도</a></li>
+                            <li><a href="#!" class="text-white text-decoration-none">스태프</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                        <h5 class="text-uppercase">SUPPORT</h5>
+                        <ul class="list-unstyled mb-0">
+                            <li><a href="#!" class="text-white text-decoration-none">다운로드</a></li>
+                            <li><a href="#!" class="text-white text-decoration-none">매뉴얼</a></li>
+                            <li><a href="#!" class="text-white text-decoration-none">자주묻는질문</a></li>
+                            <li><a href="#!" class="text-white text-decoration-none">문의</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                        <h5 class="text-uppercase">POLICY</h5>
+                        <ul class="list-unstyled mb-0">
+                            <li><a href="#!" class="text-white text-decoration-none">이용약관</a></li>
+                            <li><a href="#!" class="text-white text-decoration-none">개인정보처리방침</a></li>
+                            <li><a href="#!" class="text-white text-decoration-none">이용안내</a></li>
+                            <li><a href="#!" class="text-white text-decoration-none">제휴입점문의</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                        <h5 class="text-uppercase">SOULMATE</h5>
+                        <ul class="list-unstyled mb-0">
+                            <li><a href="#!" class="text-white text-decoration-none">서희</a></li>
+                            <li><a href="#!" class="text-white text-decoration-none">도희</a></li>
+                            <li><a href="#!" class="text-white text-decoration-none">동완</a></li>
+                            <li><a href="#!" class="text-white text-decoration-none">윤직</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+            Copyright © {{ config.site_name }} Corp. 2022-2023 All Rights Reserved.
+        </div>
+    </footer>
+</body>
+</html>

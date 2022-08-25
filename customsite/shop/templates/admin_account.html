@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+    {% load static %}
+    
+    <style>
+        #admin_nav li a {
+            color: #fff;
+        }
+
+        #admin_nav li a:hover {
+            color: #262626;
+            background-color: #fff;
+        }
+
+        .container {
+            min-width: 950px;
+        }
+
+        .left_info>div,
+        .right_info>div {
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #nav_fixed {
+            left: 5%;
+            top: 30%;
+        }
+    </style>
+
+    <script src="{% static 'js/admin.js' %}"></script>
+{% endblock %}
+
+{% block contents %}
+    <div class="d-flex mt-5 mb-5" style="min-height: 400px;">
+        <div class="w-25 d-flex justify-content-center align-items-center">
+            <div style="border-radius: 25px;" id="nav_fixed" class="position-fixed p-3 text-center bg-dark border border-3 border-light text-white d-flex align-items-center">
+                <nav class="navbar navbar-dark bg-dark px-3">
+                    <ul class="nav d-flex flex-column" id="admin_nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'Main:admin' %}">사이트 관리</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark bg-light rounded">계좌 관리</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'Main:admin_member' %}">회원 관리</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'Main:admin_point' %}">적립금 관리</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <div class="w-100">
+            <div class="w-100 h-100 left_info text-center">
+                <div class="row text-white bg-dark fw-bold rounded">
+                    <label for="" class="col-sm-2 col-form-label"><strong>은행명</strong></label>
+                    <label for="" class="col-sm-2 col-form-label"><strong>예금주</strong></label>
+                    <div class="col-sm-7">
+                        <label for="" class="col-form-label"><strong>계좌번호</strong></label>
+                    </div>
+                    <div class="col-sm-1"></div>
+                </div>
+                {% for account in accounts %}
+                    <div class="row mt-3">
+                        <label for="" class="col-sm-2 col-form-label text-center bank"><strong>{{ account.bank }}</strong></label>
+                        <label for="" class="col-sm-2 col-form-label text-center depositer"><strong>{{ account.depositer }}</strong></label>
+                        <div class="col-sm-7">
+                            <input type="text" class="form-control text-center account" value="{{ account.number }}" name="number" disabled>
+                        </div>
+                        <form class="col-sm-1" id="del_account" action="/whitevalley/admin/account/delete/{{ account.bank }}/" method="POST">
+                            {% csrf_token %}
+                            <button class="btn btn-danger">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <hr>
+                {% endfor %}
+                <div class="d-flex mt-3">
+                    <button class="m-3 btn btn-success" type="button" onclick="location.href='{% url 'Main:home' %}'">홈으로</button>
+                    <button class="m-3 btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@append">추가</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">계좌 추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{% url 'Main:account_add' %}" method="POST" id="account_add">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">은행명</label>
+                            <select class="form-select" aria-label="Default select example" name="bank">
+                                <option value="농협" selected>농협</option>
+                                <option value="국민은행">국민은행</option>
+                                <option value="기업은행">기업은행</option>
+                                <option value="신한은행">신한은행</option>
+                                <option value="외환은행">외환은행</option>
+                                <option value="우리은행">우리은행</option>
+                                <option value="SC제일은행">SC제일은행</option>
+                                <option value="KEB하나은행">KEB하나은행</option>
+                                <option value="한국시티은행">한국시티은행</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">예금주</label>
+                            <input type="text" class="form-control" value="{{ config.name }}" name="depositer">
+                        </div>
+                        <div class="mb-3">
+                            <label for="message-text" class="col-form-label">계좌번호("-"포함)</label>
+                            <input type="text" class="form-control" name="number">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    <button type="button" class="btn btn-primary" id="account_add_btn">추가</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

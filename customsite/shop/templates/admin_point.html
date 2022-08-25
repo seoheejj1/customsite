@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+    {% load static %}
+    
+    <style>
+        #admin_nav li a {
+            color: #fff;
+        }
+
+        #admin_nav li a:hover {
+            color: #262626;
+            background-color: #fff;
+        }
+
+        .container {
+            min-width: 950px;
+        }
+
+        .left_info>div,
+        .right_info>div {
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #nav_fixed {
+            left: 5%;
+            top: 30%;
+        }
+    </style>
+
+    <script src="{% static 'js/admin.js' %}?ver=1"></script>
+{% endblock %}
+
+{% block contents %}
+    <div class="d-flex mt-5 mb-5">
+        <div class="w-25 d-flex justify-content-center align-items-center">
+            <div style="border-radius: 25px;" id="nav_fixed" class="position-fixed p-3 text-center bg-dark border border-3 border-light text-white d-flex align-items-center">
+                <nav class="navbar navbar-dark bg-dark px-3">
+                    <ul class="nav d-flex flex-column" id="admin_nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'Main:admin' %}">사이트 관리</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'Main:admin_account' %}">계좌 관리</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'Main:admin_member' %}">회원 관리</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark bg-light rounded">적립금 관리</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <form class="w-100 manage_form" action="." method="POST">
+            {% csrf_token %}
+            <div class="w-100 h-100">
+                <div class="row bg-dark text-white mb-3 rounded">
+                    <label for="" class="col-sm-2 col-form-label text-center"><strong>종류</strong></label>
+                    <div class="col-sm-10 d-flex align-items-center justify-item-center">
+                        * 변경하실 숫자를 기입해주세요.
+                    </div>
+                </div>
+                <div class="row">
+                    <label for="" class="col-sm-2 col-form-label text-center"><strong>회원가입 적립금</strong></label>
+                    <div class="col-sm-10">
+                        <input type="number" class="form-control" value="{{ config.sign_point }}" name="sign_point">
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <label for="" class="col-sm-2 col-form-label text-center"><strong>구매 반환 적립금(%)</strong></label>
+                    <div class="col-sm-10">
+                        <input type="number" class="form-control" value="{{ config.return_point }}" name="return_point">
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <label for="" class="col-sm-2 col-form-label text-center"><strong>포토후기 적립금</strong></label>
+                    <div class="col-sm-10">
+                        <input type="number" class="form-control" value="{{ config.review_point }}" name="review_point">
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <label for="" class="col-sm-2 col-form-label text-center"><strong>BEST 적립금</strong></label>
+                    <div class="col-sm-10">
+                        <input type="number" class="form-control" value="{{ config.best_point }}" name="best_point">
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <label for="" class="col-sm-2 col-form-label text-center"><strong>최소 적용 가능 금액</strong></label>
+                    <div class="col-sm-10">
+                        <input type="number" class="form-control" value="{{ config.min_amount }}" name="min_amount">
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <label for="" class="col-sm-2 col-form-label text-center"><strong>최대 적용 가능 포인트</strong></label>
+                    <div class="col-sm-10">
+                        <input type="number" class="form-control" value="{{ config.max_point }}" name="max_point">
+                    </div>
+                </div>
+                <div class="d-flex mt-3 d-flex justify-content-center">
+                    <button class="m-3 btn btn-success" type="button" onclick="location.href='{% url 'Main:home' %}'">홈으로</button>
+                    <button class="m-3 btn btn-primary">수정</button>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

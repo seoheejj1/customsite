@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+    <script>
+        $.datepicker.setDefaults({
+            dateFormat: 'yy-mm-dd',
+            prevText: '이전 달',
+            nextText: '다음 달',
+            monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+            monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+            dayNames: ['일', '월', '화', '수', '목', '금', '토'],
+            dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
+            dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
+            showMonthAfterYear: true,
+            yearSuffix: '년'
+        });
+        $(function() {
+            $("#datepicker1").datepicker();
+            $("#datepicker2").datepicker();
+            
+            // reg_date
+            $("#reg_date").children().each(function() {
+                $(this).click(function() {
+                    $("#reg_date").children().each(function() {
+                        $(this)[0].disabled = false;
+                    })
+                    $(this)[0].disabled = true;
+                    $("[name='date_filter']").val($(this).text())
+
+                    if ($(this).text() == "직접선택") {
+                        $("#datepicker1")[0].disabled = false;
+                        $("#datepicker2")[0].disabled = false;
+                    } else {
+                        $("#datepicker1")[0].disabled = true;
+                        $("#datepicker2")[0].disabled = true;
+                    }
+                })
+            })
+
+            $("#order").children().each(function() {
+                $(this).click(function() {
+                    $("#order").children().each(function() {
+                        $(this)[0].disabled = false;
+                    })
+                    $(this)[0].disabled = true;
+                    $("[name='order_filter']").val($(this).text())
+                })
+            })
+
+            $("#filtering").on('submit', function() {
+                if ($("#reg_date button:last")[0].disabled) {
+                    if ($("#datepicker1").val() == "" || $("#datepicker2").val() == "") {
+                        alert("두 날짜를 모두 기입해주세요!!");
+                        return false;
+                    }
+                }
+                return true
+            })
+
+            $("[name='del_member']").on('submit', function() {
+                if(confirm("정말로 해당 유저를 회원탈퇴 처리 시키겠습니까?")) {
+                    return true;
+                }
+                return false;
+            })
+        });
+    </script>
+    <style>
+        #admin_nav li a {
+            color: #fff;
+        }
+
+        #admin_nav li a:hover {
+            color: #262626;
+            background-color: #fff;
+        }
+
+        .container {
+            min-width: 950px;
+        }
+
+        #nav_fixed {
+            left: 5%;
+            top: 30%;
+        }
+
+        #datepicker1:disabled,
+        #datepicker2:disabled {
+            background-color: darkgray;
+        }
+
+        #reg_date button:disabled,
+        #order button:disabled {
+            background-color: #fff;
+            color: #000
+        }
+    </style>
+{% endblock %}
+
+{% block contents %}
+    <div class="d-flex mt-5 mb-5">
+        <div class="w-25 d-flex justify-content-center align-items-center">
+            <div style="border-radius: 25px;" id="nav_fixed" class="position-fixed p-3 text-center bg-dark border border-3 border-light text-white d-flex align-items-center">
+                <nav class="navbar navbar-dark bg-dark px-3">
+                    <ul class="nav d-flex flex-column" id="admin_nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'Main:admin' %}">사이트 관리</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'Main:admin_account' %}">계좌 관리</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark bg-light rounded">회원 관리</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'Main:admin_point' %}">적립금 관리</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <div class="w-100">
+            <form id="filtering" method="POST" action="{% url 'Main:admin_member' %}" class="bg-dark rounded p-3 text-white text-center d-flex flex-column justify-content-evenly align-items-center">
+                {% csrf_token %}
+                <div class="w-100 row mb-3">
+                    <div class="col-sm-2 pt-2 d-flex justify-content-evenly align-items-center">
+                        <h4>가입일</h4>
+                    </div>
+                    <div class="col-sm-10">
+                        <input type="hidden" value="{{ date }}" name="date_filter">
+                        <div class="d-flex justify-content-evenly align-items-center mb-2" id="reg_date">
+                            <button type="button" class="btn btn-outline-light w-100" {% if date == "전체" %}disabled{% endif %}>전체</button>
+                            <button type="button" class="btn btn-outline-light w-100" {% if date == "오늘" %}disabled{% endif %}>오늘</button>
+                            <button type="button" class="btn btn-outline-light w-100" {% if date == "1주일" %}disabled{% endif %}>1주일</button>
+                            <button type="button" class="btn btn-outline-light w-100" {% if date == "1개월" %}disabled{% endif %}>1개월</button>
+                            <button type="button" class="btn btn-outline-light w-100" {% if date == "3개월" %}disabled{% endif %}>3개월</button>
+                            <button type="button" class="btn btn-outline-light w-100" {% if date == "직접선택" %}disabled{% endif %}>직접선택</button>
+                        </div>
+                        <div class="d-flex justify-content-center align-items-center" id="reg_date_detail">
+                            <input type="text" name="datepicker1" class="text-center form-control" id="datepicker1" value="{{ datepicker1_value }}" {% if not date == "직접선택" %}disabled{% endif %}>
+                            ~
+                            <input type="text" name="datepicker2" class="text-center form-control" id="datepicker2" value="{{ datepicker2_value }}" {% if not date == "직접선택" %}disabled{% endif %}>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-100 row">
+                    <div class="col-sm-2 d-flex justify-content-evenly align-items-center">
+                        <h4>정렬</h4>
+                    </div>
+                    <div class="col-sm-10">
+                        <input type="hidden" value="{{ order }}" name="order_filter">
+                        <div class="d-flex justify-content-evenly align-items-center mb-2" id="order">
+                            <button type="button" class="btn btn-outline-light w-100" {% if order == "가입일순" %}disabled{% endif %}>가입일순</button>
+                            <button type="button" class="btn btn-outline-light w-100" {% if order == "ID순" %}disabled{% endif %}>ID순</button>
+                            <button type="button" class="btn btn-outline-light w-100" {% if order == "닉네임순" %}disabled{% endif %}>닉네임순</button>
+                            <button type="button" class="btn btn-outline-light w-100" {% if order == "연락처순" %}disabled{% endif %}>연락처순</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-100 d-flex justify-content-center align-items-center mt-3">
+                    <button class="btn btn-success fw-bold" id="filtering_btn">검색</button>
+                </div>
+            </form>
+            <div>
+                <table class="table text-center">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">닉네임</th>
+                            <th scope="col">이메일</th>
+                            <th scope="col">연락처</th>
+                            <th scope="col">적립금</th>
+                            <th scope="col">회원가입일</th>
+                            <th scope="col">회원탈퇴</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if users %}
+                            {% for user in users %}
+                                <tr>
+                                    <th scope="row">{{ user.id }}</th>
+                                    <td>{{ user.nickname }}</td>
+                                    <td>{{ user.email | truncatechars:10 }}</td>
+                                    <td>{{ user.contact }}</td>
+                                    <td>{{ user.point }}</td>
+                                    <td>{{ user.reg_date | date:"Y-m-d" }}</td>
+                                    <td>
+                                        <form name="del_member" action="/whitevalley/admin/member/delete/{{ user.id }}/" method="POST">
+                                            {% csrf_token %}
+                                            <button class="btn btn-danger" style="font-size: 10px;">
+                                                <i class="fa-solid fa-x"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td class="text-danger pt-5" style="height: 120px;" colspan="7">
+                                    <h4>표시할 회원이 없습니다.</h4>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-center">
+                <ul class="pagination justify-content-center col-sm-9" id="pagination">
+                    {# << 표시 여부 #}        
+                    {% if users.number > 1 %}
+                        <form action="{% url 'Main:admin_member' %}" method="POST">
+                            {% csrf_token %}
+                            <li class="page-item">
+                                <input type="hidden" value="{{ date }}" name="date_filter">
+                                <input type="hidden" value="{{ order }}" name="order_filter">
+                                <button class="page-link" title="처음">
+                                    <i class='fas fa-angle-double-left'></i>
+                                </button>
+                            </li>
+                        </form>
+                    {% endif %}
+
+                    {# < 표시 여부 #}
+                    {% if start_page > 1 %}
+                        <form action="{% url 'Main:admin_member' %}?page={{ start_page | add:-1 }}" method="POST">
+                            {% csrf_token %}
+                            <li class="page-item">
+                                <input type="hidden" value="{{ date }}" name="date_filter">
+                                <input type="hidden" value="{{ order }}" name="order_filter">
+                                <button class="page-link" title="이전">
+                                    <i class='fas fa-angle-left'></i>
+                                </button>
+                            </li>
+                        </form>
+                    {% endif %}
+                    {# 페이징 안의 '숫자' 표시 #}
+                    {% if users.paginator.num_pages > 1 %}
+                        {% for p in page_range %}
+                            {% if users.number != p %}
+                                <form action="{% url 'Main:admin_member' %}?page={{ p }}" method="POST">
+                                    {% csrf_token %}
+                                    <li class="page-item">
+                                        <input type="hidden" value="{{ date }}" name="date_filter">
+                                        <input type="hidden" value="{{ order }}" name="order_filter">
+                                        <button class="page-link" title="이전">
+                                            {{ p }}
+                                        </button>
+                                    </li>
+                                </form>
+                            {% else %}
+                                <li class="page-item active"><a class="page-link" title="현재페이지">{{ p }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                    
+                    {# > 표시 #}
+                    {% if users.paginator.num_pages > end_page %}
+                        <form action="{% url 'Main:admin_member' %}?page={{ end_page | add:1 }}" method="POST">
+                            {% csrf_token %}
+                            <li class="page-item">
+                                <input type="hidden" value="{{ date }}" name="date_filter">
+                                <input type="hidden" value="{{ order }}" name="order_filter">
+                                <button class="page-link" title="다음">
+                                    <i class='fas fa-angle-right'></i>
+                                </button>
+                            </li>
+                        </form>
+                    {% endif %}
+                
+                    {# >> 표시 #}
+                    {% if users.number < users.paginator.num_pages %}
+                        <form action="{% url 'Main:admin_member' %}?page={{ users.paginator.num_pages }}" method="POST">
+                            {% csrf_token %}
+                            <li class="page-item">
+                                <input type="hidden" value="{{ date }}" name="date_filter">
+                                <input type="hidden" value="{{ order }}" name="order_filter">
+                                <button class="page-link" title="마지막">
+                                    <i class='fas fa-angle-double-right'></i>
+                                </button>
+                            </li>
+                        </form>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

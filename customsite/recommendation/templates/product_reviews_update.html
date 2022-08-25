@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/recommendation.css' %}?ver=1">
+<script src="{% static 'js/recommendation.js' %}"></script>
+<style>
+    #bol {
+        color: blue;
+    }
+
+    .revhead {
+        border-top: 1px solid blue;
+        border-bottom: 1px solid #eee;
+        border-left: 1px solid #eee;
+        border-right: 1px solid #eee;
+        height: 100px;
+        color: black;
+        margin: 10px;
+    }
+
+    .spr {
+        font-size: large;
+        font-weight: bolder;
+    }
+
+    .review-intake-form__head {
+        margin: 10px
+    }
+
+    .review-intake-form {
+        font-size: large;
+        font-weight: bolder;
+    }
+
+    .review-table {
+        margin: 10px
+    }
+
+    .my__rev {
+        font-weight: bolder;
+    }
+
+    .field__title {
+        font-weight: bolder;
+    }
+
+    .review-intake-register {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .cancel-button {
+        padding: 10px;
+        background-color: rgb(233, 234, 240);
+        border-radius: 12px;
+        color: #0088FF
+    }
+
+    .submit-button {
+        padding: 10px;
+        background-color: #0088FF;
+        color: white;
+        border-radius: 12px;
+    }
+
+    .insert {
+        padding: 20px 30px;
+        display: block;
+        width: 600px;
+        margin: 5vh auto;
+        height: 40vh;
+
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
+    .insert .file-list {
+        height: 200px;
+        overflow: auto;
+        border: 1px solid #989898;
+        padding: 10px;
+    }
+
+    .insert .file-list .filebox p {
+        font-size: 14px;
+        margin-top: 10px;
+        display: inline-block;
+    }
+
+    .insert .file-list .filebox .delete i {
+        color: #ff5353;
+        margin-left: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block contents %}
+<h2>리뷰수정</h2>
+<hr id='bol'>
+<div class='revhead'>
+    <img class="my-review-profile__frame__image js_reviewProfileImage"
+        src="https://img1a.coupangcdn.com/image/coupang/review/web/mycoupang/pc-profile-empty.png" alt="프로필 이미지"
+        title="프로필 이미지" style='margin:10px'>
+    <span>{{ user.nickname }} 님</span>
+</div>
+<hr style='color: black'>
+
+
+<div class="review-intake-form__head">
+    <div class="review-intake-form__title">
+        <img src="https://image6.coupangcdn.com/image/productreview/badge/review/write/product/product_icon-xxhdpi.png"
+            style='width:30px' />
+        <span class='spr'>상품 품질 리뷰</span>
+    </div>
+    <div class="review-intake-form__subtitle">
+        <span class="review-intake-form__sub-text">이 상품의 품질에 대해서 얼마나 만족하시나요?</span>
+    </div>
+    <hr>
+</div>
+
+<form action="{% url 'Recommendation:product_reviews_update' review.id %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+<div class="review-table">
+    <div class="review-table__cell review-intake-head title">
+        <img src="{{review.order.product.img}}"
+            width="200" height="200" title="구매상품" alt="구매상품" />
+
+        <span>
+            <div class="review-intake-form">상품내역 : {{review.order.product.type}}</div>
+            <div class="review-intake-form">상품옵션 : {{review.order.product.size}}</div>
+        </span>
+    </div>
+    <hr style='color: black'>
+</div>
+<div class="mb-3 mt-3">
+    <label for="title">제목:</label>
+    <input type="text" class="form-control" id="title" placeholder="리뷰제목을 입력하세요" value="{{review.title}}" name="title"  required>
+</div>
+
+
+<div class="mb-3 mt-3">
+    <label class='my__rev' for="contents">상세리뷰</label>
+    <textarea class="form-control" rows="5" id="contents" placeholder="상품 품질에 대한 고객님의 솔직한 리뷰를 남겨주세요." name="contents"
+        required>{{review.contents}}</textarea>
+</div>
+<hr style='color: black'>
+
+<div class="my-review__modify__file">
+    <div class="field__title">사진첨부</div>
+    <div class="insert">
+        <input type="file" name="uploadedFile" onchange="addFile(this);" required/>
+        <div class="file-list"></div>
+    </div>
+    
+    <hr style='color: black'>
+</div>
+
+<div class="review-intake-register">
+    <button class="submit-button" type="submit">등록하기</button>
+    <button class="cancel-button" type="button" onclick="history.back()">취소하기</button>
+</div>
+
+<script>
+
+    $("[name='uploadedFile']").change(function() {console.log($(this).val())})
+
+</script>
+{% endblock %}

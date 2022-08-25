@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/user.css' %}?ver=1">
+    <script src="{% static 'js/user.js' %}"></script>
+{% endblock %}
+
+{% block contents %}
+
+<div class="title mb-5 mt-5">
+    <br>
+    <h2>매거진</h2>
+    <h6>다양한 브랜드의 컬렉션을 집중 소개하며 커스텀 주문에 도움을 줄 유용한 가이드를 담은 콘텐츠를 제공합니다.</h6>
+    <hr>
+</div>
+
+<section> 
+<div class="row">
+    <div class="col-12">
+      {% if session.admin %}
+      <button type="button" class="btn btn-outline-dark float-end col-2" onclick="chkDelete()" display="none">삭제</button>
+      <a class="btn btn-outline-dark float-end col-2 " href="{% url 'User:magazine_update' magazine.pk %}" role="button" display="none">수정</a> 
+      {% endif %}
+    </div>
+  </div>
+  
+
+<div class="content" >
+    <div class="col-lg-12" >
+
+        <div class="ml-3 mb-3 mt-3">
+            <h2 >{{ magazine.title }}</h2>
+
+            <div class="mb-3 mt-3 clearfix">
+                {% if session.admin %}
+                <div class="float-start ms-4">게시물 번호 : {{ magazine.id }} </div>
+                {% endif %}
+                <div class="float-end ms-4">작성일 : {{ magazine.reg_date|date:"Y-m-d H:i:s" }} </div>
+                <div class="float-end">조회수 : {{ magazine.view_cnt }} </div> 
+            </div>
+            <hr>
+        </div>
+
+
+        <div class="mb-3 mt-3" >
+            <div class="imgshow" style="text-align : center;">
+                <br>
+                {% if photo.board == board %}
+                    <div class='mb-3 mt-3'>
+                        <img class="imgshow " style="text-align : center" width="auto" height="100%" src="{{ photos.photo }}" alt="..."/>
+                    </div>
+                {% endif %}
+            </div>
+            <br>
+            <pre style="width:100%; text-align:center;" rows="10">{{ magazine.content }}</pre>
+        </div>
+            <br>
+            <br>
+            <hr>            
+        </div>
+        <br>
+        <a class="btn btn-outline-dark float-end mb-3 col-4" href="{% url 'User:magazine_list' %}">목록</a>
+        <br>
+    </div>
+
+</div>
+
+    <form action="{% url 'User:magazine_delete' %}" name="delete" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="id" value="{{ magazine.id }}">
+    </form>
+
+    <script>
+    function chkDelete(){
+        var d = confirm("삭제하시겠습니까?");
+        if(d){
+            document.forms['delete'].submit();
+        }
+    }
+    </script>
+
+</section>
+<br>
+<br>
+
+{% endblock %}

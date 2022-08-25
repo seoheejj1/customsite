@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/user.css' %}?ver=1">
+    <script src="{% static 'js/user.js' %}"></script>
+    <script src="https://kit.fontawesome.com/88062657ea.js" crossorigin="anonymous"></script>
+
+{% endblock %}
+
+{% block contents %}
+
+<div class="title mb-5 mt-5">
+    <br>
+    <h2>매거진 > 작성</h2>
+    <hr>
+</div>
+
+
+<form action="." method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="magazine" value="매거진">
+    {% csrf_token %}
+    <div class="col-lg-12">
+
+        <div class="mb-3 mt-3">
+            <label class="mb-3" for="title">제목 :</label>
+            <input type="text" class="form-control" id="title" placeholder="제목을 입력하세요" name="title" required>
+        </div>
+        <div class="mb-3 mt-3" >
+            <label class="mb-3" for="content">내용 :</label>
+            <textarea class="form-control" rows="20" id="content" placeholder="내용을 입력하세요" name="content" required></textarea>
+        </div>
+        <div>
+            <input class="btn-outline-dark mt-3" type="file" name="uploadedFile"><br>
+            <button type="submit" class="btn btn-outline-dark mt-3 float-end col-2">작성완료</button>
+            <a class="btn btn-outline-dark mt-3 mb-3 float-end col-2" href="{% url 'User:magazine_list' %}">목록</a>
+            <br>
+            <br>
+        </div>
+    </div>
+</form>
+<br>
+<br>
+<br>
+
+{% endblock %}

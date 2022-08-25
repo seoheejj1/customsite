@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block attachment %}
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<style>
+    @media (max-width: 1500px) {
+       #footer > .btn{ 
+           width:40%;
+           margin:60px 0 100px 0;
+       }
+       #footer{
+            display: contents;
+            margin:80px 0 500px 0;
+       }
+    }
+
+</style>
+{% endblock %}
+
+{% block contents %}
+    <div style="display: inline-block; margin:50px 0 0 0; border-bottom:1px solid rgb(172, 172, 172);">
+        <legend>My Information</legend>
+    </div>
+    <form action="." method="POST" id="myform">
+        {% csrf_token %}
+        <div class="textbox" style="display: flex; margin:50px 0 20px 0">
+            <label for="">ID</label>
+            <div style="padding-left:50px; padding-right:20px"><input type="text" class="form-control col-4" value="{{ user.email }}" disabled></div>
+        </div>
+        <div class="textbox" style="display: flex; margin-bottom:20px">
+            <label for="">PW</label>
+            <div style="padding-left:43px; padding-right:30px; z-index: 1;" id="pw_wrapper"><input type="text" style="-webkit-text-security: disc; z-index: 0;" placeholder="클릭하여 변경" class="form-control col-4" name="pw1" id="pw1" disabled></div>
+            <label for="">확인</label>
+            <div style="padding-left:20px"><input type="text" style="-webkit-text-security: disc;" class="form-control col-4" placeholder="PW 재확인" name="pw2" id="pw2" disabled></div>
+            <input name="pw_check" value="상태" style="width: 60px;background-color: white; margin-left:15px; border-radius:15px; text-align:center;"disabled></input>
+        </div>
+        <div class="textbox" style="display: flex; margin-bottom:20px">
+            <label for="">닉네임</label>
+            <div style=" padding-left:20px"><input type="text" class="form-control col-4" value="{{ user.nickname }}" name="nick"></div>
+        </div>
+        <div class="textbox" style="display: flex; margin-bottom:20px">
+            <label for="">연락처</label>
+            <div style=" padding-left:20px"><input type="text" class="form-control col-4" value="{{ user.contact }}" name="cont"></div>
+        </div>
+        <div class="textbox" style=" margin-bottom:20px" name="aaa">
+            <label for="" style="padding: 8px;">주소</label>
+
+            <div class="col-2"  style="display: inline-block; margin:0px 3px 6px 16px;"><input id="sample4_postcode" type="text" class="form-control" name="adress0" placeholder="우편번호" disabled value="{{ adress.0 }}"></div>
+            <input type="button" class="btn btn-light" onclick="sample4_execDaumPostcode()" value="우편번호 찾기">
+
+            <div class="col-7" style="display: flex; padding-left:69px">
+                <input id="sample4_roadAddress" type="text" class="form-control" style=" margin-right:10px" name="adress1" placeholder="도로명주소" value="{{ adress.1 }}"> 
+                <input id="sample4_jibunAddress" type="text" class="form-control" name="adress2" placeholder="지번주소" value="{{ adress.2 }}">
+            </div>
+            <div class="col-4" style="display: flex; margin:8px 0 0 69px;">
+                <input id="sample4_detailAddress" type="text" class="form-control" style=" margin-right:10px" name="adress4" placeholder="상세주소" value="{{ adress.4 }}">
+                <input id="sample4_extraAddress" type="text" class="form-control" name="adress3" placeholder="참고항목" value="{{ adress.3 }}">
+            </div>
+        </div>
+        <div style="margin:0 0 200px 0; padding:40px 0 0 800px;" id="footer">
+            <a class="btn btn-dark" style="margin-right:10px;" href="{% url 'User:mypage' %}">돌아가기</a>
+            <button class="btn btn-dark" name="my_change" type="submit()">변경</button>
+        </div>
+        <div>
+            <input type="hidden" name="adress6">
+            <input type="hidden" name="adress7" value="{{ user.adress }}">
+        </div>
+
+        {{ user.adress }}
+    </form>
+
+<script>
+    $("#pw_wrapper").click(function() {
+        if ($(this)[0].style.zIndex == 1) {
+            if(confirm("비밀번호를 변경하시겠습니까?")){
+                $("#pw1")
+                    .removeAttr('disabled')
+                    .css("zIndex", 1);
+                $("#pw2").removeAttr('disabled');
+                $(this).css("zIndex", 0);
+            }
+        }
+    })
+
+    if($("#pw1").attr("readonly",false)){
+        $("[name='pw1']").on('keyup', function(){
+            if($("[name='pw2']").val() != $(this).val()){
+                $("[name='pw_check']").val("불일치")
+                $("[name='pw_check']").css("color","red")
+            }else{
+                $("[name='pw_check']").val("일치")
+                $("[name='pw_check']").css("color","blue")
+            }
+            });
+        $("[name='pw2']").on('keyup', function(){
+            if($("[name='pw1']").val() != $(this).val()){
+                $("[name='pw_check']").val("불일치")
+                $("[name='pw_check']").css("color","red")
+            }else{
+                $("[name='pw_check']").val("일치")
+                $("[name='pw_check']").css("color","blue")
+            }
+        });
+    }
+    
+    $("[name='adress4']").on('keyup', function(){
+        $("[name='adress7']").val($("[name='adress6']").val()+ $(this).val())
+    })
+
+
+    function sample4_execDaumPostcode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+                // 도로명 주소의 노출 규칙에 따라 주소를 표시한다.
+                // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+                var roadAddr = data.roadAddress; // 도로명 주소 변수
+                var extraRoadAddr = ''; // 참고 항목 변수
+
+                // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+                // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+                if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                    extraRoadAddr += data.bname;
+                }
+                // 건물명이 있고, 공동주택일 경우 추가한다.
+                if(data.buildingName !== '' && data.apartment === 'Y'){
+                   extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                }
+                // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+                if(extraRoadAddr !== ''){
+                    extraRoadAddr = ' (' + extraRoadAddr + ')';
+                }
+
+
+                var adress = "";
+
+                // 우편번호와 주소 정보를 해당 필드에 넣는다.
+                document.getElementById('sample4_postcode').value = data.zonecode;
+                document.getElementById("sample4_roadAddress").value = roadAddr;
+                document.getElementById("sample4_jibunAddress").value = data.jibunAddress;
+                document.getElementById("sample4_detailAddress").focus();
+               
+
+                // 참고항목 문자열이 있을 경우 해당 필드에 넣는다.
+                if(roadAddr !== ''){
+                    document.getElementById("sample4_extraAddress").value = extraRoadAddr;
+                } else {
+                    document.getElementById("sample4_extraAddress").value = '';
+                }
+
+                var guideTextBox = document.getElementById("guide");
+                // 사용자가 '선택 안함'을 클릭한 경우, 예상 주소라는 표시를 해준다.
+
+                adress += $("[name='adress0']").val();
+                adress += "_" + $("[name='adress1']").val();
+                adress += "_" + $("[name='adress2']").val();
+                adress += "_" + $("[name='adress3']").val(); 
+                adress +=  "_" ;
+                
+                $("[name='adress6']").val(adress)
+             
+            }
+        }).open();
+    }
+</script>
+
+{% endblock %}
